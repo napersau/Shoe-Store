@@ -1,0 +1,142 @@
+/*
+Custom Css
+*/
+
+.nav-link.top-nav-link {
+    padding: 8px;
+    border-radius: 5px; /* Bo góc nhẹ */
+
+    box-sizing: border-box; /* Đảm bảo viền không làm phần tử to lên */
+}
+
+.nav-link.top-nav-link:focus,
+.nav-link.top-nav-link:active {
+    border: 2px solid black; /* Viền đen khi click */
+    outline: none;
+}
+
+.tmpPadding{
+    padding-left: 80px;
+    padding-right: 80px;
+}
+.tmpNoiDung{
+    width: 50%;
+    margin: 20px auto;
+}
+
+.product-card {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .image-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .product-image {
+    width: 100%;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .product-card:hover .overlay {
+    opacity: 1;
+  }
+
+
+  
+
+/* Kiểu dáng chung cho danh sách giỏ hàng */
+.list-group {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+}
+
+/* Từng sản phẩm trong giỏ hàng */
+.list-group-item {
+  display: flex;
+  align-items: center;
+  border: none;
+  padding: 12px 15px;
+  transition: background 0.3s;
+  border-bottom: 1px solid #ddd; /* Viền ngăn cách nhẹ */
+}
+
+.list-group-item:last-child {
+  border-bottom: none; /* Bỏ viền cuối */
+}
+
+.list-group-item:hover {
+  background: #f8f9fa; /* Hiệu ứng hover nhẹ */
+}
+
+/* Hình ảnh sản phẩm */
+.list-group-item img {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-right: 15px;
+}
+
+/* Thông tin sản phẩm */
+.product-info {
+  flex-grow: 1;
+}
+
+.product-info h6 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.product-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Kiểu dáng form thanh toán */
+.payment-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+  border: 1px solid #e0e0e0;
+}
+
+.payment-form input,
+.payment-form textarea {
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.payment-form button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  background: #28a745;
+  color: white;
+  border: none;
+  transition: 0.3s;
+}
+
+.payment-form button:hover {
+  background: #218838;
+}
+
+  
