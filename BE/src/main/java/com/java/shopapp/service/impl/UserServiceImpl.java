@@ -2,7 +2,6 @@ package com.java.shopapp.service.impl;
 
 
 import com.java.shopapp.dto.GoogleAccountDTO;
-import com.java.shopapp.dto.request.RoleRequest;
 import com.java.shopapp.dto.request.UserCreateRequest;
 import com.java.shopapp.dto.request.UserUpdateRequest;
 import com.java.shopapp.dto.response.UserResponse;
@@ -18,18 +17,13 @@ import com.java.shopapp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final CartRepository cartRepository;
+
 
     @Override
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
@@ -108,6 +103,8 @@ public class UserServiceImpl implements UserService {
         var context = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(context).orElseThrow(()
                 -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+
         return modelMapper.map(user, UserResponse.class);
     }
 

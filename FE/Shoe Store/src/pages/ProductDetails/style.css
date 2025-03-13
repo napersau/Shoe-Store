@@ -1,0 +1,53 @@
+.swatch-grid {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+.swatch-element {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+
+.swatch-element.selected {
+    border-color: #007bff;
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.5);
+}
+
+
+.swatch-element.selected:hover {
+    background-color: #007bff;
+    border-color: #0056b3;
+}
+
+.swatch-element:not(.soldout):hover {
+    border-color: #007bff;
+    transform: scale(1.1);
+}
+
+.swatch-element.soldout {
+    border-color: #ddd;
+    color: #999;
+    cursor: not-allowed;
+    background-color: #f8f8f8;
+    text-decoration: line-through;
+}
+
+.swatch-element input[type="radio"] {
+    display: none;
+}

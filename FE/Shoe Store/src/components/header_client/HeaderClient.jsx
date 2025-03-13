@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getToken, removeToken } from "../../services/localStorageService";
@@ -8,7 +9,7 @@ import "../../assets/css/bootstrap.min.css";
 import "../../assets/css/templatemo.css";
 import "../../assets/css/custom.css";
 
-const Header = () => {
+const HeaderClient = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -62,6 +63,7 @@ const Header = () => {
     setIsLoggedIn(false);
     setIsAdmin(false);
     navigate("/login");
+    window.location.reload();
   };
 
   return (
@@ -124,7 +126,7 @@ const Header = () => {
 
               {/* Dropdown tài khoản */}
               <div className="nav-item dropdown">
-                <a className="nav-link top-nav-link" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown">
+                <a className="nav-link top-nav-link" href="/" id="accountDropdown" role="button" data-bs-toggle="dropdown">
                   <i className="fa-solid fa-user"></i>
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="accountDropdown">
@@ -162,4 +164,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderClient;

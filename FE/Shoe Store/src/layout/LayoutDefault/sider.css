@@ -1,0 +1,27 @@
+.header__collapse{
+    /* margin-right: 20px; */
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+.anticon svg {
+    display: inline-block;
+    font-size: 30px;
+}
+.ant-menu {
+    margin-top: 30px;
+}
+.ant-menu svg {
+    font-size: 25px;
+}
+.ant-menu-title-content a{
+    text-decoration: none;
+}
+
+.sider .ant-menu-item-selected {
+    background-color: transparent !important; /* Không đổi màu nền khi được chọn */
+    color: #000  !important; /* Giữ màu chữ gốc */
+}

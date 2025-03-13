@@ -100,8 +100,6 @@ public class ProductController {
         List<ProductResponse> productResponseList = productService.findAllProducts(productSearchRequest);
 
 
-        apiResponse.setTotalPages((int) Math.ceil((double) productResponseList.size() / apiResponse.getTotalItems()));
-
         apiResponse.setResult(productResponseList);
         return apiResponse;
     }

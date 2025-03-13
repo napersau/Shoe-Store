@@ -1,7 +1,7 @@
 package com.java.shopapp.utils;
 
-
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -10,7 +10,6 @@ import java.io.IOException;
 
 @Component
 public class UploadFileUtils {
-
     public static void writeOrUpdate(String path, byte[] bytes) {
 
         path = "C:/Users/84334/Desktop/react/example-webapp/public/" + path;

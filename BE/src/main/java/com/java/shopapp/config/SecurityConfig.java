@@ -2,6 +2,7 @@ package com.java.shopapp.config;
 
 import com.java.shopapp.enums.Role;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -27,31 +30,68 @@ import org.springframework.web.filter.CorsFilter;
 
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 //@EnableMethodSecurity
 public class SecurityConfig {
 
+
     @Value("${jwt.signerKey}")
     private String signerKey;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users","auth/**", "/login/**","/users/**"};
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
+
+    private final String[] PUBLIC_ENDPOINTS = {"/users","/auth/**", "/login/**","/users/**"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.PUT,PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "auth/signingoogle", "/oauth2/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/client").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/client/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/product-list").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/products/product-list").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/order/manager").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.POST, "/api/vnpay/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/vnpay/**").permitAll()
 
-//                        .requestMatchers(HttpMethod.GET,"/users").hasRole(Role.ADMIN.name())
+
+                        // Cart
+                        .requestMatchers(HttpMethod.GET, "/cart").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.DELETE, "/cart").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        //Cart-details
+                        .requestMatchers(HttpMethod.POST, "/cart-detail").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.DELETE, "/cart-detail/{id}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.GET, "/cart-detail").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        //Order
+                        .requestMatchers(HttpMethod.POST, "/order").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.POST, "/order/{id}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PUT, "/order").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/order", "/order/filter").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.GET, "/order/manager", "/order/manager/filter").hasRole(Role.ADMIN.name())
+                        //Order-Details
+                        .requestMatchers(HttpMethod.GET, "/order-details").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        //Product
+                        .requestMatchers(HttpMethod.POST, "/products").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/products").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/products/{productId}").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/products/{productId}").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/products/{productId}").hasRole(Role.ADMIN.name())
+
+
+                        //User
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/users/my-info").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PUT, "/users/{userId}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+
+
+
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler((request, response, authentication) -> {
@@ -61,7 +101,7 @@ public class SecurityConfig {
 
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecode())
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtConverter())));
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
@@ -84,24 +124,33 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
-
     @Bean
     JwtAuthenticationConverter jwtConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        // "SCOPE_" -> "ROLE_"
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        // Custom converter để đọc role từ "scope.name"
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+
+            // Lấy claim "scope"
+            Map<String, Object> scope = jwt.getClaim("scope");
+            if (scope != null && scope.containsKey("name")) {
+                String roleName = "ROLE_" + scope.get("name"); // -> ROLE_ADMIN
+                authorities.add(new SimpleGrantedAuthority(roleName));
+                System.out.println("ROLE: " + roleName);
+            }
+
+            return authorities;
+        });
+
         return converter;
     }
 
-    @Bean
-    public JwtDecoder jwtDecode(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
+
 
     @Bean
     PasswordEncoder passwordEncoder() {

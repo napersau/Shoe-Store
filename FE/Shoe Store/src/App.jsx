@@ -1,9 +1,9 @@
-import AppRoutes from "./routes/AppRoutes";
+import AllRoute from "./components/AllRoute";
 
 function App() {
   return (
     <>
-      <AppRoutes />
+      <AllRoute/>
     </>
   );
 }
