@@ -22,9 +22,8 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [snackBarOpen, setSnackBarOpen] = useState(false);
-
-
-
+  const [page, setPage] = useState(0);
+  const limit = 6;
 
   // State cho bộ lọc
   const [filters, setFilters] = useState({
@@ -46,7 +45,6 @@ export default function Shop() {
   const fetchProducts = (searchParams) => {
     setLoading(true);
     setError("");
-
     // Thêm sortBy vào query params nếu có giá trị
     if (sortBy) {
       searchParams.sortBy = sortBy;
@@ -55,8 +53,8 @@ export default function Shop() {
     const queryString = new URLSearchParams(
       Object.entries(searchParams).filter(([_, value]) => value !== null && value !== "")
     ).toString();
-
-    fetch(`http://localhost:8080/products/product-list?${queryString}`, {
+    console.log(queryString)
+    fetch(`http://localhost:8080/products/product-list?${queryString}&limit=${limit}`, {
       method: "GET",
     })
       .then((response) => {
@@ -77,15 +75,28 @@ export default function Shop() {
       });
   };
   const handleSearch = () => {
-    const searchParams = {};
-    Object.keys(filters).forEach((key) => {
-      if (filters[key]) {
-        searchParams[key] = filters[key];
-      }
-    });
-
+    setPage(0);
+    const searchParams = { ...filters, page: 0 };
     fetchProducts(searchParams);
   };
+  const onClickPrevPage = () => {
+    if (page > 0) {
+      setPage(prevPage => {
+        const newPage = prevPage - 1;
+        fetchProducts({ ...filters, page: newPage });
+        return newPage;
+      });
+    }
+  };
+
+  const onClickNextPage = () => {
+    setPage(prevPage => {
+      const newPage = prevPage + 1;
+      fetchProducts({ ...filters, page: newPage });
+      return newPage;
+    });
+  };
+
 
   return (
     <>
@@ -136,7 +147,22 @@ export default function Shop() {
             <MenuItem value={"Shucare"}>Shucare</MenuItem>
           </TextField>
 
-          <ColorPicker />
+          <ColorPicker
+            value={filters.color}
+            onChange={(color) => {
+              const colorNames = {
+                black: "Đen",
+                white: "Trắng",
+                red: "Đỏ",
+                blue: "Xanh dương",
+                green: "Xanh lá",
+                yellow: "Vàng",
+                "": "",
+              };
+              setFilters({ ...filters, color: colorNames[color] });
+            }}
+          />
+
 
           <TextField
             label="Danh mục"
@@ -195,7 +221,7 @@ export default function Shop() {
             </Snackbar>
           ) : (
             <Grid container spacing={3} justifyContent="center" sx={{ maxWidth: "85%", margin: "0 auto" }}>
-              {products.map((product) => (
+              {products.content.map((product) => (
                 <Grid item key={product.id} xs={12} sm={6} md={4} >
                   <Card
                     className="product-card"
@@ -206,7 +232,7 @@ export default function Shop() {
                       boxshadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
                       maxWidth: "300px", // Giảm kích thước card sản phẩm
                       margin: "auto", // Căn giữa trong grid
-                      marginTop: "20px", 
+                      marginTop: "20px",
                     }}
                   >
                     <div className="image-container" style={{ textAlign: "center" }}>
@@ -243,8 +269,13 @@ export default function Shop() {
                 </Grid>
               ))}
             </Grid>
-
           )}
+          <Typography variant="h4" gutterBottom align="center" sx={{ mt: 2 }}>
+            <Button onClick={onClickPrevPage} disabled={page === 0}>Prev Page</Button>
+            <Button onClick={onClickNextPage} disabled={page === 2}>Next Page</Button>
+          </Typography>
+
+
         </Box>
       </Box >
     </>

@@ -12,21 +12,21 @@ function Footer() {
                             <ul className="list-unstyled text-light footer-link-list">
                                 <li>
                                     <i className="fas fa-map-marker-alt fa-fw"></i>
-                                    123 Consectetur at ligula 10660
+                                    Hà Nội
                                 </li>
                                 <li>
                                     <i className="fa fa-phone fa-fw"></i>
-                                    <a className="text-decoration-none" href="tel:010-020-0340">010-020-0340</a>
+                                    <a className="text-decoration-none" href="tel:0334787050">0334787050</a>
                                 </li>
                                 <li>
                                     <i className="fa fa-envelope fa-fw"></i>
-                                    <a className="text-decoration-none" href="mailto:info@company.com">info@company.com</a>
+                                    <a className="text-decoration-none" href="mailto:khoinguyenduc7@gmail.com">khoinguyenduc7@gmail.com</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div className="col-md-4 pt-5">
-                            <h2 className="h2 text-light border-bottom pb-3 border-light">Products</h2>
+                            <h2 className="h2 text-light border-bottom pb-3 border-light">Sản phẩm</h2>
                             <ul className="list-unstyled text-light footer-link-list">
                                 <li><a className="text-decoration-none" href="/">Luxury</a></li>
                                 <li><a className="text-decoration-none" href="/">Sport Wear</a></li>
@@ -39,13 +39,13 @@ function Footer() {
                         </div>
 
                         <div className="col-md-4 pt-5">
-                            <h2 className="h2 text-light border-bottom pb-3 border-light">Further Info</h2>
+                            <h2 className="h2 text-light border-bottom pb-3 border-light">Thông tin</h2>
                             <ul className="list-unstyled text-light footer-link-list">
-                                <li><a className="text-decoration-none" href="/">Home</a></li>
-                                <li><a className="text-decoration-none" href="/">About Us</a></li>
-                                <li><a className="text-decoration-none" href="/">Shop Locations</a></li>
-                                <li><a className="text-decoration-none" href="/">FAQs</a></li>
-                                <li><a className="text-decoration-none" href="/">Contact</a></li>
+                                <li><a className="text-decoration-none" href="/">Trang chủ</a></li>
+
+                                <li><a className="text-decoration-none" href="/">Địa điểm của hàng</a></li>
+                                <li><a className="text-decoration-none" href="/">Câu hỏi</a></li>
+                                <li><a className="text-decoration-none" href="/">Liên hệ</a></li>
                             </ul>
                         </div>
 
@@ -72,7 +72,7 @@ function Footer() {
                             </ul>
                         </div>
                         <div className="col-auto">
-                            <label className="sr-only" htmlFor="subscribeEmail">Email address</label>
+                            <label className="sr-only" htmlFor="subscribeEmail">Địa chỉ Email</label>
                             <div className="input-group mb-2">
                                 <input type="text" className="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address" />
                                 <button className="btn btn-success text-light">Subscribe</button>
@@ -86,8 +86,7 @@ function Footer() {
                         <div className="row pt-2">
                             <div className="col-12">
                                 <p className="text-left text-light">
-                                    Copyright &copy; 2021 Company Name
-                                    | Designed by <a rel="sponsored" href="/" target="_blank">TemplateMo</a>
+                                    <a rel="sponsored" href="/" target="_blank">Đức Khởi</a>
                                 </p>
                             </div>
                         </div>

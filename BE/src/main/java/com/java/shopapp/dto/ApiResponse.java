@@ -15,6 +15,6 @@ public class ApiResponse<T> {
     private int code = 1000;
     private String message;
     private T result;
-    private Integer totalItems = 6;
-    private Integer totalPages;
+    private int totalPages;
+
 }

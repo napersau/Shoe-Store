@@ -17,6 +17,10 @@ import com.java.shopapp.utils.UploadFileUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,10 +100,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> findAllProducts(ProductSearchRequest productSearchRequest) {
+    public Page<ProductResponse> findAllProducts(ProductSearchRequest productSearchRequest, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
         ProductSearchBuilder productSearchBuilder = productSearchBuilderConverter.toProductSearchBuider(productSearchRequest);
-        List<Product> productEntities = productRepository.findAllProducts(productSearchBuilder);
-        return productEntities.stream().map(pr -> modelMapper.map(pr, ProductResponse.class)).collect(Collectors.toList());
+        List<Product> productEntities = productRepository.findAllProducts(productSearchBuilder, pageable);
+
+
+        List<ProductResponse> productResponses = productEntities
+                .stream()
+                .map(pr -> modelMapper.map(pr, ProductResponse.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(productResponses, pageable, productResponses.size());
+    }
+
+    @Override
+    public long countTotalProducts(ProductSearchRequest productSearchRequest) {
+        ProductSearchBuilder productSearchBuilder = productSearchBuilderConverter.toProductSearchBuider(productSearchRequest);
+        long cnt = productRepository.countAllProducts(productSearchBuilder);
+        return cnt;
     }
 
     private void saveThumbnail(ProductRequest productRequest, Product product)

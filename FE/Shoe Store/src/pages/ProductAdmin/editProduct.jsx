@@ -55,7 +55,7 @@ export default function EditProduct() {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        setProduct({ ...product, imageBase64: reader.result, imageName: file.name });
+        setProduct({ ...product, imageBase64: reader.result.split(",")[1], imageName: file.name });
       };
       setImageFile(file);
     }

@@ -8,6 +8,7 @@ import com.java.shopapp.dto.response.ProductResponse;
 import com.java.shopapp.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -79,13 +80,18 @@ public class ProductController {
     }
 
     @GetMapping("/product-list")
-    ApiResponse<List<ProductResponse>> getAllProductsForClient(@RequestParam Map<String, Object> params) {
+    ApiResponse<Page<ProductResponse>> getAllProductsForClient(
+            @RequestParam Map<String, Object> params,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {
+
         ProductSearchRequest productSearchRequest = new ProductSearchRequest();
 
         productSearchRequest.setName(params.get("name") == null ? "" : params.get("name").toString());
         productSearchRequest.setBrand(params.get("brand") == null ? "" : params.get("brand").toString());
         productSearchRequest.setColor(params.get("color") == null ? "" : params.get("color").toString());
         productSearchRequest.setSortBy(params.get("sortBy") == null ? "" : params.get("sortBy").toString());
+
         if (params.get("priceFrom") != null) {
             productSearchRequest.setPriceFrom(Double.parseDouble(params.get("priceFrom").toString()));
         }
@@ -95,14 +101,22 @@ public class ProductController {
         if (params.get("category_id") != null) {
             productSearchRequest.setCategory_id(Long.parseLong(params.get("category_id").toString()));
         }
-        ApiResponse<List<ProductResponse>> apiResponse = new ApiResponse<>();
 
-        List<ProductResponse> productResponseList = productService.findAllProducts(productSearchRequest);
+        ApiResponse<Page<ProductResponse>> apiResponse = new ApiResponse<>();
+
+        Page<ProductResponse> productResponsePage = productService.findAllProducts(productSearchRequest, page, size);
+
+        long totalProducts = productService.countTotalProducts(productSearchRequest);
+
+        apiResponse.setResult(productResponsePage);
+
+        int totalPages = (int) Math.ceil((double) totalProducts / size);
+        apiResponse.setTotalPages(totalPages);
 
 
-        apiResponse.setResult(productResponseList);
         return apiResponse;
     }
+
 
 
 }

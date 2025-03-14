@@ -4,20 +4,20 @@ import { Dropdown } from "antd";
 import { ExpandMore } from "@mui/icons-material";
 
 const ColorDropdown = ({ selectedColor, onColorSelect }) => {
-  const colors = [
-    "none", "black","white","red","blue","green","yellow"
-  ];
+  const colors = ["none", "black", "white", "red", "blue", "green", "yellow"];
 
   const menu = (
-    <div style={{ 
-      display: "grid", 
-      gridTemplateColumns: "repeat(5, 1fr)", 
-      gap: "8px", 
-      padding: "10px", 
-      background: "#fff", 
-      borderRadius: "8px", 
-      boxShadow: "0 2px 8px rgba(0,0,0,0.15)" 
-    }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(5, 1fr)",
+        gap: "8px",
+        padding: "10px",
+        background: "#fff",
+        borderRadius: "8px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
       {colors.map((color) => (
         <div
           key={color}
@@ -27,14 +27,14 @@ const ColorDropdown = ({ selectedColor, onColorSelect }) => {
             backgroundColor: color === "none" ? "transparent" : color,
             borderRadius: "4px",
             cursor: "pointer",
-            border: selectedColor === color ? "2px solid #000" : "2px solid transparent",
+            border:
+              selectedColor === color ? "2px solid #000" : "2px solid transparent",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: "12px",
             color: "#333",
             fontWeight: "bold",
-            border: "1px solid #ddd"
           }}
           onClick={() => onColorSelect(color === "none" ? "" : color)}
         >
@@ -53,15 +53,31 @@ const ColorDropdown = ({ selectedColor, onColorSelect }) => {
   );
 };
 
-const ColorPicker = () => {
-  const [filters, setFilters] = useState({ brand: "" });
-  const [selectedColor, setSelectedColor] = useState("");
+const ColorPicker = ({ defaultValue, onChange }) => {
+  const [selectedColor, setSelectedColor] = useState(defaultValue || "");
+
+  const colorNames = {
+    black: "Đen",
+    white: "Trắng",
+    red: "Đỏ",
+    blue: "Xanh dương",
+    green: "Xanh lá",
+    yellow: "Vàng",
+    "": "Không có",
+  };
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    if (onChange) {
+      onChange(color);
+    }
+  };
 
   return (
     <TextField
       label="Màu sắc"
       fullWidth
-      value={selectedColor || "None"}
+      value={colorNames[selectedColor]}
       margin="dense"
       InputProps={{
         startAdornment: selectedColor && (
@@ -78,13 +94,7 @@ const ColorPicker = () => {
           </InputAdornment>
         ),
         endAdornment: (
-          <ColorDropdown
-            selectedColor={selectedColor}
-            onColorSelect={(color) => {
-              setSelectedColor(color);
-              setFilters({ ...filters, brand: color });
-            }}
-          />
+          <ColorDropdown selectedColor={selectedColor} onColorSelect={handleColorChange} />
         ),
       }}
     />

@@ -8,6 +8,7 @@ import com.java.shopapp.repository.custom.ProductRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
@@ -68,13 +69,30 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<Product> findAllProducts(ProductSearchBuilder productSearchBuilder) {
+    public List<Product> findAllProducts(ProductSearchBuilder productSearchBuilder, Pageable pageable) {
         StringBuilder sql = new StringBuilder("SELECT p.* FROM products p ");
         StringBuilder where = new StringBuilder(" WHERE 1 = 1 ");
         queryNormal(productSearchBuilder, where);
         querySpecial(productSearchBuilder, where);
         sql.append(where);
         Query query = entityManager.createNativeQuery(sql.toString(), Product.class);
+
+        // Phân trang
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
         return query.getResultList();
+    }
+
+    @Override
+    public Long countAllProducts(ProductSearchBuilder productSearchBuilder) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM products p ");
+        StringBuilder where = new StringBuilder(" WHERE 1 = 1 ");
+        queryNormal(productSearchBuilder, where);
+        querySpecial(productSearchBuilder, where);
+        sql.append(where);
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        return ((Number) query.getSingleResult()).longValue();
     }
 }
