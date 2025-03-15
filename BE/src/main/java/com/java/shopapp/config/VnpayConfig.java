@@ -1,57 +1,61 @@
 package com.java.shopapp.config;
 
+import com.java.shopapp.utils.VNPayUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+@Configuration
 public class VnpayConfig {
 
+    @Getter
     @Value("${vnpay.vnp-url}")
     private String vnp_PayUrl;
-
-
     @Value("${vnpay.vnp-return-url}")
-    private String vnp_Returnurl;
-
+    private String vnp_ReturnUrl;
     @Value("${vnpay.tmn-code}")
-    private String vnp_TmnCode;
-
+    private String vnp_TmnCode ;
+    @Getter
     @Value("${vnpay.hash-secret}")
-    private static String vnp_HashSecret;
+    private String secretKey;
 
+    private String vnp_Version = "2.1.0";
 
-    public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+    private String vnp_Command = "pay";
 
+    private String orderType = "other";
 
-    private static final String SECRET_KEY = "your-secret-key"; // Key bảo mật từ VNPAY
-
-    public static String hashAllFields(Map<String, String> fields) {
-        String data = fields.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .collect(Collectors.joining("&"));
-
-        return hmacSHA512(SECRET_KEY, data);
-    }
-
-    private static String hmacSHA512(String key, String data) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(key.getBytes(StandardCharsets.UTF_8));
-            byte[] bytes = md.digest(data.getBytes(StandardCharsets.UTF_8));
-
-            StringBuilder sb = new StringBuilder();
-            for (byte aByte : bytes) {
-                sb.append(String.format("%02x", aByte));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Error while hashing data", e);
-        }
+    public Map<String, String> getVNPayConfig() {
+        Map<String, String> vnpParamsMap = new HashMap<>();
+        vnpParamsMap.put("vnp_Version", this.vnp_Version);
+        vnpParamsMap.put("vnp_Command", this.vnp_Command);
+        vnpParamsMap.put("vnp_TmnCode", this.vnp_TmnCode);
+        vnpParamsMap.put("vnp_CurrCode", "VND");
+        vnpParamsMap.put("vnp_TxnRef",  VNPayUtil.getRandomNumber(8));
+        vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang:" +  VNPayUtil.getRandomNumber(8));
+        vnpParamsMap.put("vnp_OrderType", this.orderType);
+        vnpParamsMap.put("vnp_Locale", "vn");
+        vnpParamsMap.put("vnp_ReturnUrl", this.vnp_ReturnUrl);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnpCreateDate = formatter.format(calendar.getTime());
+        vnpParamsMap.put("vnp_CreateDate", vnpCreateDate);
+        calendar.add(Calendar.MINUTE, 15);
+        String vnp_ExpireDate = formatter.format(calendar.getTime());
+        vnpParamsMap.put("vnp_ExpireDate", vnp_ExpireDate);
+        return vnpParamsMap;
     }
 
 

@@ -6,6 +6,7 @@ import com.java.shopapp.dto.GoogleAccountDTO;
 import com.java.shopapp.dto.request.AuthenticationRequest;
 import com.java.shopapp.dto.request.IntrospectRequest;
 import com.java.shopapp.dto.request.LogoutRequest;
+import com.java.shopapp.dto.request.RefreshRequest;
 import com.java.shopapp.dto.response.AuthenticationResponse;
 import com.java.shopapp.dto.response.IntrospectResponse;
 import com.java.shopapp.repository.UserRepository;
@@ -84,6 +85,15 @@ public class AuthenticationController {
     ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> reFreshToken(@RequestBody RefreshRequest request) throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .code(1000)
+                .result(result)
+                .build();
     }
 
 

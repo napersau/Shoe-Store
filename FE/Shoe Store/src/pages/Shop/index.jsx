@@ -7,22 +7,24 @@ import {
   CardMedia,
   CardContent,
   Typography,
-  CircularProgress,
   Snackbar,
   Alert,
   TextField,
   Button,
   MenuItem,
+  Skeleton,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useAsyncError } from "react-router-dom";
 import ColorPicker from "../../components/colorDropDown";
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 export default function Shop() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const [maxPage,setMaxPage]=useState(1);
   const limit = 6;
 
   // State cho bộ lọc
@@ -64,7 +66,9 @@ export default function Shop() {
         return response.json();
       })
       .then((data) => {
+
         setProducts(data.result || []);
+        setMaxPage(data.totalPages)
         setLoading(false);
       })
       .catch((error) => {
@@ -93,6 +97,7 @@ export default function Shop() {
     setPage(prevPage => {
       const newPage = prevPage + 1;
       fetchProducts({ ...filters, page: newPage });
+      console.log(maxPage)
       return newPage;
     });
   };
@@ -210,7 +215,32 @@ export default function Shop() {
             Cửa hàng
           </Typography>
           {loading ? (
-            <CircularProgress />
+            <Grid container spacing={3} justifyContent="center" sx={{ maxWidth: "85%", margin: "0 auto" }}>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <Grid item key={index} xs={12} sm={6} md={4}>
+                  <Card
+                    className="product-card"
+                    sx={{
+                      p: 1,
+                      borderRadius: "20px",
+                      boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
+                      maxWidth: "300px",
+                      margin: "auto",
+                      marginTop: "20px",
+                      height: "355px",
+                    }}
+                  >
+                    <div className="image-container" style={{ textAlign: "center" }}>
+                      <Skeleton variant="rectangular" width="100%" height={250} />
+                    </div>
+                    <CardContent sx={{ padding: "8px" }}>
+                      <Skeleton width="60%" height={24} sx={{ margin: "auto" }} />
+                      <Skeleton width="40%" height={20} sx={{ margin: "auto", marginTop: "8px" }} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
           ) : error ? (
             <Snackbar
               open={snackBarOpen}
@@ -222,16 +252,16 @@ export default function Shop() {
           ) : (
             <Grid container spacing={3} justifyContent="center" sx={{ maxWidth: "85%", margin: "0 auto" }}>
               {products.content.map((product) => (
-                <Grid item key={product.id} xs={12} sm={6} md={4} >
+                <Grid item key={product.id} xs={12} sm={6} md={4}>
                   <Card
                     className="product-card"
                     sx={{
-                      // border: "1px solid #333",
                       p: 1,
+                      height: "355px",
                       borderRadius: "20px",
-                      boxshadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
-                      maxWidth: "300px", // Giảm kích thước card sản phẩm
-                      margin: "auto", // Căn giữa trong grid
+                      boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
+                      maxWidth: "300px",
+                      margin: "auto",
                       marginTop: "20px",
                     }}
                   >
@@ -239,20 +269,17 @@ export default function Shop() {
                       <CardMedia
                         component="img"
                         sx={{
-                          height: "250px", // Giảm chiều cao ảnh
+                          height: "250px",
                           width: "auto",
                           maxWidth: "100%",
                           objectFit: "contain",
                         }}
-                        image={`${product.image}`} // Đảm bảo đường dẫn đúng
+                        image={`${product.image}`}
                         alt={product.name}
                         className="product-image"
                       />
                       <div className="overlay">
-                        <Link
-                          className="btn btn-success text-white mt-2"
-                          to={`/shop/${product.id}`}
-                        >
+                        <Link className="btn btn-success text-white mt-2" to={`/shop/${product.id}`}>
                           Xem chi tiết
                         </Link>
                       </div>
@@ -271,11 +298,10 @@ export default function Shop() {
             </Grid>
           )}
           <Typography variant="h4" gutterBottom align="center" sx={{ mt: 2 }}>
-            <Button onClick={onClickPrevPage} disabled={page === 0}>Prev Page</Button>
-            <Button onClick={onClickNextPage} disabled={page === 2}>Next Page</Button>
+            <Button onClick={onClickPrevPage} disabled={page === 0}><ArrowBackIcon/></Button>
+            <span style={{color:"blue", fontSize:"20px"}}>{page+1}</span>
+            <Button onClick={onClickNextPage} disabled={page === (maxPage-1)}><ArrowForwardIcon/></Button>
           </Typography>
-
-
         </Box>
       </Box >
     </>

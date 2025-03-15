@@ -28,13 +28,10 @@ function Footer() {
                         <div className="col-md-4 pt-5">
                             <h2 className="h2 text-light border-bottom pb-3 border-light">Sản phẩm</h2>
                             <ul className="list-unstyled text-light footer-link-list">
-                                <li><a className="text-decoration-none" href="/">Luxury</a></li>
-                                <li><a className="text-decoration-none" href="/">Sport Wear</a></li>
-                                <li><a className="text-decoration-none" href="/">Men's Shoes</a></li>
-                                <li><a className="text-decoration-none" href="/">Women's Shoes</a></li>
-                                <li><a className="text-decoration-none" href="/">Popular Dress</a></li>
-                                <li><a className="text-decoration-none" href="/">Gym Accessories</a></li>
-                                <li><a className="text-decoration-none" href="/">Sport Shoes</a></li>
+                                <li><a className="text-decoration-none" href="/">Giày thể thao</a></li>
+                                <li><a className="text-decoration-none" href="/">Phụ kiện</a></li>
+                                <li><a className="text-decoration-none" href="/"></a></li>
+                          
                             </ul>
                         </div>
 
@@ -74,8 +71,8 @@ function Footer() {
                         <div className="col-auto">
                             <label className="sr-only" htmlFor="subscribeEmail">Địa chỉ Email</label>
                             <div className="input-group mb-2">
-                                <input type="text" className="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address" />
-                                <button className="btn btn-success text-light">Subscribe</button>
+                                <input type="text" className="form-control bg-dark border-light" id="subscribeEmail" placeholder="Địa chỉ email" />
+                                <button className="btn btn-success text-light">Gửi</button>
                             </div>
                         </div>
                     </div>

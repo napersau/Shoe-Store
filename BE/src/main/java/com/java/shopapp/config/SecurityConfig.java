@@ -53,12 +53,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
+
                         .requestMatchers(HttpMethod.PUT,PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/client").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/client/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/product-list").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/vnpay/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/vnpay/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/payment/**").permitAll()
 
 
                         // Cart
@@ -97,6 +98,7 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             response.sendRedirect("http://localhost:3000/auth/signingoogle");
                         })
+
                 );
 
 

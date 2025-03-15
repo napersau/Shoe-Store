@@ -80,8 +80,12 @@ public class ProductServiceImpl implements ProductService {
         }
         modelMapper.map(productRequest, product);
         product.setId(product.getId());
+        Category category = categoryRepository.findById(productRequest.getCategory_id()).get();
+        product.setCategory(category);
         saveThumbnail(productRequest, product);
         productRepository.save(product);
+
+
         ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
         productResponse.setId(id);
         return productResponse;

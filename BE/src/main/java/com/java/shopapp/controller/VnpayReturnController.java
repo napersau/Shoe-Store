@@ -1,13 +1,6 @@
 package com.java.shopapp.controller;
 
-import com.java.shopapp.config.VnpayConfig;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class VnpayReturnController {

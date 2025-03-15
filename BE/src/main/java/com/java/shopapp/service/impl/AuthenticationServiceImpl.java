@@ -3,6 +3,7 @@ package com.java.shopapp.service.impl;
 import com.java.shopapp.dto.request.AuthenticationRequest;
 import com.java.shopapp.dto.request.IntrospectRequest;
 import com.java.shopapp.dto.request.LogoutRequest;
+import com.java.shopapp.dto.request.RefreshRequest;
 import com.java.shopapp.dto.response.AuthenticationResponse;
 import com.java.shopapp.dto.response.IntrospectResponse;
 import com.java.shopapp.dto.response.UserResponse;
@@ -104,6 +105,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     }
 
+    @Override
+    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+
+        var signedJWT = verifyToken(request.getToken());
+
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var username = signedJWT.getJWTClaimsSet().getSubject();
+
+        var user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHENTICATED)
+        );
+
+        var token = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
+    }
+
     private String generateToken(User user) {
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
@@ -149,11 +179,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return signedJWT;
     }
 
-//    private String buildScope(User user) {
-//        StringJoiner stringJoiner = new StringJoiner(" ");
-//        if(!CollectionUtils.isEmpty(user.getRole()) {
-//            user.getRoles().forEach(stringJoiner::add);
-//        }
-//        return stringJoiner.toString();
-//    }
 }

@@ -12,4 +12,5 @@ import java.util.List;
 public interface CartDetailRepository extends JpaRepository<CartDetail, Long> {
     List<CartDetail> getCartDetailsByCartId(Long cartId);
     void deleteByCartId(Long cartId);
+    CartDetail findByProductIdAndSize(Long productId, Double size);
 }
