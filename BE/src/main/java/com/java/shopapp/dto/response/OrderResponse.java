@@ -15,7 +15,6 @@ public class OrderResponse {
 
     private Long userId;
 
-//    private List<OrderDetail> orderDetails;
 
     private String fullName;
 

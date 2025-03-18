@@ -6,15 +6,13 @@ import com.java.shopapp.dto.response.OrderResponse;
 import com.java.shopapp.entity.*;
 import com.java.shopapp.exception.AppException;
 import com.java.shopapp.exception.ErrorCode;
-import com.java.shopapp.repository.CartDetailRepository;
-import com.java.shopapp.repository.OrderRepository;
-import com.java.shopapp.repository.ProductRepository;
-import com.java.shopapp.repository.UserRepository;
+import com.java.shopapp.repository.*;
 import com.java.shopapp.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,11 +22,13 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final ModelMapper modelMapper;
     private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
     private final UserRepository userRepository;
     private final CartDetailRepository cartDetailRepository;
     private final ProductRepository productRepository;
@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(orderRequest.getPaymentMethod())
                 .paymentStatus(orderRequest.getPaymentStatus())
                 .orderDate(new Date())
-                .status("Người nhận đang chuẩn bị hàng.")
+                .status("Người bán đang chuẩn bị hàng.")
                 .build();
 
         // Ds chi tiết đơn hàng
@@ -71,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setUser(user);
         order.setOrderDate(new Date());
-        order.setStatus("Người bán đang chuẩn bị hàng.");
+        order.setStatus("Người bán đang chuẩn bị hàng");
         for (OrderDetail orderDetail : orderDetails) {
             orderDetail.setOrder(order);
         }
@@ -163,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(orderRequest.getPaymentMethod())
                 .paymentStatus(orderRequest.getPaymentStatus())
                 .orderDate(new Date())
-                .status("Người nhận đang chuẩn bị hàng.")
+                .status("Người bán đang chuẩn bị hàng")
                 .build();
 
         orderDetail.setOrder(order);
@@ -181,6 +181,19 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> modelMapper.map(order, OrderResponse.class))
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public void deleteOrderById(Long id) {
+        orderDetailRepository.deleteByOrderId(id);
+        orderRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateOrderPaymentStatusById(Long id, String status) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setPaymentStatus(status);
+        orderRepository.save(order);
     }
 
 

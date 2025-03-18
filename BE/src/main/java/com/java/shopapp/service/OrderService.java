@@ -19,4 +19,7 @@ public interface OrderService {
 
     List<OrderResponse> getOrdersByStatus(String status);
 
+    void deleteOrderById(Long id);
+    void updateOrderPaymentStatusById(Long id, String status);
+
 }

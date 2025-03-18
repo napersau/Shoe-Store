@@ -77,4 +77,19 @@ public class OrderController {
         return apiResponse;
     }
 
+    @DeleteMapping("/{id}")
+    ApiResponse<OrderResponse> deleteOrder(@PathVariable Long id) {
+        ApiResponse<OrderResponse> apiResponse = new ApiResponse<>();
+        orderService.deleteOrderById(id);
+        return apiResponse;
+    }
+
+    @PutMapping("/{orderId}/update-payment")
+    public ApiResponse<?> updatePaymentStatus(@PathVariable Long orderId) {
+        ApiResponse<OrderResponse> apiResponse = new ApiResponse<>();
+        orderService.updateOrderPaymentStatusById(orderId, "Đã thanh toán");
+        return apiResponse;
+
+    }
+
 }

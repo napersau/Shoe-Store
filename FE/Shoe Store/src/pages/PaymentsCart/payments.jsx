@@ -43,20 +43,42 @@ const Payments = () => {
 
   const handleVNPayPayment = async () => {
     try {
-      // Lưu dữ liệu vào localStorage để sử dụng sau khi thanh toán
-      localStorage.setItem("fullName", formData.fullName);
-      localStorage.setItem("email", formData.email);
-      localStorage.setItem("address", formData.address);
-      localStorage.setItem("note", formData.note);
-      localStorage.setItem("quantity", quantity);
-      localStorage.setItem("totalMoney", totalMoney);
-      localStorage.setItem("size", size);
+      const token = getToken();
+      const orderData = {
+        ...formData,
+        numberOfProducts: quantity,
+        totalMoney,
+        size,
+        paymentMethod: "VNPay - Cổng thanh toán điện tử",
+        paymentStatus: "Đang chờ thanh toán",
+      };
   
-      const response = await fetch(`http://localhost:8080/payment/vn-pay?amount=${totalMoney}&bankCode=NCB`);
-      const data = await response.json();
+      // Gửi đơn hàng về backend trước khi chuyển sang VNPay
+      const orderResponse = await fetch(`http://localhost:8080/order/${finalProductId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
   
-      if (data.code === 200 && data.result.paymentUrl) {
-        window.location.href = data.result.paymentUrl;
+      if (!orderResponse.ok) {
+        throw new Error("Không thể tạo đơn hàng");
+      }
+  
+      // Lưu thông tin orderId để cập nhật sau này
+      const orderResult = await orderResponse.json();
+      localStorage.setItem("orderId", orderResult.result.id); 
+  
+      // Chuyển sang VNPay
+      const paymentResponse = await fetch(
+        `http://localhost:8080/payment/vn-pay?amount=${totalMoney}&bankCode=NCB`
+      );
+      const paymentData = await paymentResponse.json();
+  
+      if (paymentData.code === 200 && paymentData.result.paymentUrl) {
+        window.location.href = paymentData.result.paymentUrl;
       } else {
         alert("Lỗi khi tạo thanh toán VNPay!");
       }
@@ -65,6 +87,8 @@ const Payments = () => {
       alert("Đã xảy ra lỗi khi xử lý thanh toán VNPay!");
     }
   };
+  
+  
   
 
   const handleSubmit = async (e) => {
