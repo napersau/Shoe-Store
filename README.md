@@ -12,15 +12,25 @@
         <p>Dự án Shoe Store là một ứng dụng Web quản lý, mua bán các sản phẩm giày và phụ kiện, được xây dựng bằng  Spring Boot, Spring Security(JWT Authentication), Spring JPA(ORM), MySQL, RESTful API, Swagger.
       	</p>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/1.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/2.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/3.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/4.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/5.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/6.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
-        <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/7.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
+        <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/7.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;">
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/8.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <br></br>
         <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/9.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
-        <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/10.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;">    
+        <br></br>
+        <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/logo/10.png" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;">  
+        <br></br>
     </div>
     <div class="section">
         <h2>Cách chạy chương trình</h2>
