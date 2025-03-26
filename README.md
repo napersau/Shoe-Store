@@ -11,7 +11,7 @@
         <h2>Giới thiệu</h2>
         <p>Dự án Shoe Store là một ứng dụng Web quản lý, mua bán các sản phẩm giày và phụ kiện, được xây dựng bằng  Spring Boot, Spring Security(JWT Authentication), Spring JPA(ORM), MySQL, RESTful API, Swagger.
       	</p>
-        <img src="/" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
+        <img src="https://github.com/napersau/Shoe-Store/blob/main/FE/Shoe%20Store/public/%25PUBLIC_URL%25/logo/capy.jpeg" alt="Ảnh Demo" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:5px; padding:5px;"> 
     </div>
     <div class="section">
         <h2>Cách chạy chương trình</h2>
