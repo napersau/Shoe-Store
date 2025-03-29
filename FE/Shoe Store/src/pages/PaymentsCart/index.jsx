@@ -220,7 +220,7 @@ const PaymentsCart = () => {
                   className="form-check-input"
                   id="vnpay"
                   name="paymentMethod"
-                  value="VNPay - Cổng thanh toán điện tử"  // 🔄 Thay đổi giá trị ở đây
+                  value="VNPay - Cổng thanh toán điện tử"  //  Thay đổi giá trị ở đây
                   checked={formData.paymentMethod === "VNPay - Cổng thanh toán điện tử"}
                   onChange={handlePaymentMethodChange}
                 />

@@ -63,6 +63,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if(!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+        if(authenticationRequest.getLoginMethod().equals("LoginNormal") && user.getGoogleAccountId() == 1) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
         var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)

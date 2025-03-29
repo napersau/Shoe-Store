@@ -169,11 +169,32 @@ const Payments = () => {
 
             <div className="mb-3">
               <label>Phương thức thanh toán</label>
-              <select className="form-control" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
-                <option value="VNPay">VNPay</option>
-              </select>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="cod"
+                  checked={paymentMethod === "Thanh toán khi nhận hàng"}
+                  onChange={() => setPaymentMethod("Thanh toán khi nhận hàng")}
+                />
+                <label className="form-check-label" htmlFor="cod">
+                  Thanh toán khi nhận hàng
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="vnpay"
+                  checked={paymentMethod === "VNPay"}
+                  onChange={() => setPaymentMethod("VNPay")}
+                />
+                <label className="form-check-label" htmlFor="vnpay">
+                  VNPay
+                </label>
+              </div>
             </div>
+
 
             <button type="submit" className="btn btn-success">Xác nhận thanh toán</button>
           </form>

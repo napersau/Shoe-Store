@@ -34,6 +34,7 @@ public class AuthenticationController {
 
     @PostMapping("/token")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+        request.setLoginMethod("LoginNormal");
         var result = authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .code(1000)
@@ -71,7 +72,7 @@ public class AuthenticationController {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
         authenticationRequest.setUsername(email);
         authenticationRequest.setPassword(email);
-
+        authenticationRequest.setLoginMethod("LoginGoogle");
         var result = authenticationService.authenticate(authenticationRequest);
 
         return ApiResponse.<AuthenticationResponse>builder()
