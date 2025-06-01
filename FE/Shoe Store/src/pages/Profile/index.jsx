@@ -12,7 +12,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({});
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [form] = Form.useForm();
+  const [passwordForm] = Form.useForm();
 
   useEffect(() => {
     const token = getToken();
@@ -110,6 +112,41 @@ export default function Profile() {
     setUpdatedUser({ ...updatedUser, ...changedValues });
   };
 
+  const handlePasswordChange = (values) => {
+    if (values.newPassword !== values.confirmNewPassword) {
+      message.error("Mật khẩu mới không khớp!");
+      return;
+    }
+
+    const token = getToken();
+    fetch(`http://localhost:8080/users/password/${user.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        oldPassword: values.oldPassword,
+        newPassword: values.newPassword,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Đổi mật khẩu thất bại!");
+        }
+        return response.json();
+      })
+      .then(() => {
+        message.success("Đổi mật khẩu thành công!");
+        passwordForm.resetFields();
+        setShowPasswordForm(false);
+      })
+      .catch((error) => {
+        console.error("Lỗi API:", error);
+        message.error(error.message);
+      });
+  };
+
   return (
     <div className="profile-container">
       <Title level={2} className="profile-title">
@@ -172,6 +209,48 @@ export default function Profile() {
               >
                 Chỉnh sửa thông tin
               </Button>
+              <Button
+                type="default"
+                onClick={() => setShowPasswordForm(!showPasswordForm)}
+                style={{ marginTop: 12, marginLeft: 12 }}
+              >
+                {showPasswordForm ? "Hủy đổi mật khẩu" : "Đổi mật khẩu"}
+              </Button>
+
+              {showPasswordForm && (
+                <Form
+                  form={passwordForm}
+                  layout="vertical"
+                  onFinish={handlePasswordChange}
+                  className="password-form"
+                  style={{ marginTop: 24 }}
+                >
+                  <Form.Item
+                    label="Mật khẩu cũ"
+                    name="oldPassword"
+                    rules={[{ required: true, message: "Vui lòng nhập mật khẩu cũ" }]}
+                  >
+                    <Input.Password />
+                  </Form.Item>
+                  <Form.Item
+                    label="Mật khẩu mới"
+                    name="newPassword"
+                    rules={[{ required: true, message: "Vui lòng nhập mật khẩu mới" }]}
+                  >
+                    <Input.Password />
+                  </Form.Item>
+                  <Form.Item
+                    label="Nhập lại mật khẩu mới"
+                    name="confirmNewPassword"
+                    rules={[{ required: true, message: "Vui lòng nhập lại mật khẩu mới" }]}
+                  >
+                    <Input.Password />
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Xác nhận đổi mật khẩu
+                  </Button>
+                </Form>
+              )}
             </>
           )}
         </Card>

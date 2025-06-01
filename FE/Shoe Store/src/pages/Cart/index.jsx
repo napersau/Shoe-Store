@@ -147,7 +147,7 @@ const Cart = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" mt={4}>
-      <Typography variant="h4" gutterBottom>Giỏ hàng của bạn</Typography>
+      <Typography style={{marginTop:80}} variant="h4" gutterBottom>Giỏ hàng của bạn</Typography>
 
       {loading ? (
         <CircularProgress />

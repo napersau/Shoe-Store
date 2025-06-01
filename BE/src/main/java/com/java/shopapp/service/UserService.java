@@ -14,4 +14,5 @@ public interface UserService {
     UserResponse updateUser(Long id,UserUpdateRequest userUpdateRequest);
     UserResponse getMyInfo();
     UserResponse createByGoogleAccount(GoogleAccountDTO googleAccountDTO);
+    UserResponse changePassword(Long id, UserUpdateRequest userUpdateRequest);
 }

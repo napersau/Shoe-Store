@@ -7,9 +7,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MoreIcon from "@mui/icons-material/MoreVert";
-import { logOut } from "../../services/authenticationService";
 import Button from "@mui/material/Button";
-
+import { logOut, getToken } from "../../services/authenticationService";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -17,6 +16,8 @@ export default function Header() {
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const token = getToken(); // Lấy token ở đây
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -35,7 +36,7 @@ export default function Header() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const handleLogout = (event) => {
+  const handleLogout = () => {
     handleMenuClose();
     logOut();
     window.location.href = "/login";
@@ -48,7 +49,6 @@ export default function Header() {
       anchorOrigin={{
         vertical: "top",
         horizontal: "right",
-
       }}
       id={menuId}
       keepMounted
@@ -83,12 +83,11 @@ export default function Header() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
           aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
+          aria-controls={menuId}
           aria-haspopup="true"
           color="inherit"
         >
@@ -131,7 +130,7 @@ export default function Header() {
                 color="success"
                 sx={{
                   textTransform: "none",
-                  marginLeft: "10px", // Đẩy nút "Quản trị" sát bên phải avatar
+                  marginLeft: "10px",
                   backgroundColor: "#68C51C",
                   "&:hover": { backgroundColor: "#57A31B" },
                 }}
@@ -143,25 +142,40 @@ export default function Header() {
           </IconButton>
 
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
 
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              sx={{
-                borderRadius: "50%",
-                padding: "5px",
-                transition: "background-color 0.3s",
-              }}
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+          {/* Hiển thị đăng nhập hoặc nút đăng nhập */}
+          <Box sx={{ display: "flex", alignItems: "center", color: "white", mr: 2 }}>
+            {token ? (
+              <>
+                <span>Đã đăng nhập</span>
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-label="account of current user"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                  sx={{
+                    borderRadius: "50%",
+                    padding: "5px",
+                    transition: "background-color 0.3s",
+                  }}
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </>
+            ) : (
+              <Button
+                variant="outlined"
+                color="inherit"
+                onClick={() => (window.location.href = "/login")}
+              >
+                Đăng nhập
+              </Button>
+            )}
           </Box>
+
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -174,9 +188,9 @@ export default function Header() {
               <MoreIcon />
             </IconButton>
           </Box>
-
         </Toolbar>
       </AppBar>
+
       {renderMobileMenu}
       {renderMenu}
     </Box>

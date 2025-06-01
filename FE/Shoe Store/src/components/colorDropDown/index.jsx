@@ -75,7 +75,6 @@ const ColorPicker = ({ defaultValue, onChange }) => {
 
   return (
     <TextField
-      label="Màu sắc"
       fullWidth
       value={colorNames[selectedColor]}
       margin="dense"

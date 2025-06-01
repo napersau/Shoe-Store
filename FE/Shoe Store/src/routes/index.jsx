@@ -22,6 +22,7 @@ import HomeAd from "../pages/Home";
 import PrivateRoutesAdmin from "../components/PrivateRoutes/adminPrivate";
 import Payments from "../pages/PaymentsCart/payments";
 import PaymentSuscess from "../pages/PaymentsCart/PaymentSuscess";
+
 export const routes = [
     {
         path: '/',

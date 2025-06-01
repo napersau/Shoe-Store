@@ -49,6 +49,15 @@ public class UserController {
         return userService.updateUser(userId, userUpdateRequest);
     }
 
+    @PutMapping("/password/{userId}")
+    ApiResponse<UserResponse> changePassword(@PathVariable("userId") Long userId, @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        return ApiResponse.<UserResponse>builder()
+                .code(1000)
+                .result(userService.changePassword(userId, userUpdateRequest))
+                .build();
+    }
+
     @GetMapping("/my-info")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()

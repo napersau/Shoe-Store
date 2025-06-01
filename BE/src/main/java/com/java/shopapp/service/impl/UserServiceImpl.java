@@ -136,4 +136,20 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(savedUser, UserResponse.class);
     }
+
+    @Override
+    public UserResponse changePassword(Long id, UserUpdateRequest userUpdateRequest) {
+        var context = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(context).orElseThrow(()
+                -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        boolean authenticated =  passwordEncoder.matches(userUpdateRequest.getOldPassword(), user.getPassword());
+        if(!authenticated) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        else{
+            user.setPassword(passwordEncoder.encode(userUpdateRequest.getNewPassword()));
+        }
+        userRepository.save(user);
+        return modelMapper.map(user, UserResponse.class);
+    }
 }

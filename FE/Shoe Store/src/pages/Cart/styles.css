@@ -1,0 +1,110 @@
+.shop-container {
+  padding: 120px 16px 16px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+
+.filter-section {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-container {
+  margin-top: 16px;
+}
+
+.filter-input,
+.filter-select {
+  width: 100%;
+}
+
+.filter-button {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.filter-button:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.product-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.image-container:hover .overlay {
+  opacity: 1;
+}
+
+.overlay .ant-btn {
+  background: #fff;
+  color: #1890ff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.overlay .ant-btn:hover {
+  background: #1890ff;
+  color: #fff;
+}
+
+.error-alert {
+  margin-bottom: 16px;
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-button {
+  border-radius: 4px;
+}
+
+.pagination-text {
+  font-size: 16px;
+  color: #595959;
+}
+
+h5.ant-typography {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}

@@ -90,90 +90,108 @@ export default function Shop() {
   };
 
   return (
-    <div className="shop-container">
+    <div className="shop-container" style={{marginTop:80}}>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
           <div className="filter-section">
             <Title level={4}>Bộ lọc sản phẩm</Title>
             <div className="filter-container">
               <Space direction="vertical" style={{ width: "100%" }} size="middle">
-                <Input
-                  placeholder="Tên sản phẩm"
-                  value={filters.name}
-                  onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-                  className="filter-input"
-                />
-                <Select
-                  placeholder="Giá cả"
-                  style={{ width: "100%" }}
-                  value={
-                    filters.priceFrom !== null || filters.priceTo !== null
-                      ? `${filters.priceFrom || ""}-${filters.priceTo || ""}`
-                      : ""
-                  }
-                  onChange={(value) => {
-                    const [priceFrom, priceTo] = value.split("-").map((v) => (v === "" ? null : Number(v)));
-                    setFilters({ ...filters, priceFrom, priceTo });
-                  }}
-                  className="filter-select"
-                >
-                  <Option value="0-">Tất cả</Option>
-                  <Option value="-1000000">Dưới 1 triệu</Option>
-                  <Option value="1000000-2000000">Từ 1 triệu đến 2 triệu</Option>
-                  <Option value="2000000-3000000">Từ 2 triệu đến 3 triệu</Option>
-                  <Option value="3000000-5000000">Từ 3 triệu đến 5 triệu</Option>
-                  <Option value="5000000-">Trên 5 triệu</Option>
-                </Select>
-                <Select
-                  placeholder="Thương hiệu"
-                  style={{ width: "100%" }}
-                  value={filters.brand}
-                  onChange={(value) => setFilters({ ...filters, brand: value })}
-                  className="filter-select"
-                >
-                  <Option value="">Tất cả</Option>
-                  <Option value="Vans">Vans</Option>
-                  <Option value="Adidas">Adidas</Option>
-                  <Option value="Nike">Nike</Option>
-                  <Option value="Shucare">Shucare</Option>
-                </Select>
-                <ColorPicker
-                  value={filters.color}
-                  onChange={(color) => {
-                    const colorNames = {
-                      black: "Đen",
-                      white: "Trắng",
-                      red: "Đỏ",
-                      blue: "Xanh dương",
-                      green: "Xanh lá",
-                      yellow: "Vàng",
-                      "": "",
-                    };
-                    setFilters({ ...filters, color: colorNames[color] });
-                  }}
-                />
-                <Select
-                  placeholder="Danh mục"
-                  style={{ width: "100%" }}
-                  value={filters.category_id ?? ""}
-                  onChange={(value) => setFilters({ ...filters, category_id: value || null })}
-                  className="filter-select"
-                >
-                  <Option value="">Tất cả</Option>
-                  <Option value={1}>Phụ kiện</Option>
-                  <Option value={2}>Giày</Option>
-                </Select>
-                <Select
-                  placeholder="Sắp xếp theo"
-                  style={{ width: "100%" }}
-                  value={sortBy}
-                  onChange={(value) => setSortBy(value)}
-                  className="filter-select"
-                >
-                  <Option value="">Mặc định</Option>
-                  <Option value="price ASC">Giá tăng dần</Option>
-                  <Option value="price DESC">Giá giảm dần</Option>
-                </Select>
+                <div>
+                  <Title level={5}>Tên sản phẩm</Title>
+                  <Input
+                    placeholder="Tên sản phẩm"
+                    value={filters.name}
+                    onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                    className="filter-input"
+                  />
+                </div>
+                <div>
+                  <Title level={5}>Giá cả</Title>
+                  <Select
+                    placeholder="Giá cả"
+                    style={{ width: "100%" }}
+                    value={
+                      filters.priceFrom !== null || filters.priceTo !== null
+                        ? `${filters.priceFrom || ""}-${filters.priceTo || ""}`
+                        : ""
+                    }
+                    onChange={(value) => {
+                      const [priceFrom, priceTo] = value.split("-").map((v) => (v === "" ? null : Number(v)));
+                      setFilters({ ...filters, priceFrom, priceTo });
+                    }}
+                    className="filter-select"
+                  >
+                    <Option value="0-">Tất cả</Option>
+                    <Option value="-1000000">Dưới 1 triệu</Option>
+                    <Option value="1000000-2000000">Từ 1 triệu đến 2 triệu</Option>
+                    <Option value="2000000-3000000">Từ 2 triệu đến 3 triệu</Option>
+                    <Option value="3000000-5000000">Từ 3 triệu đến 5 triệu</Option>
+                    <Option value="5000000-">Trên 5 triệu</Option>
+                  </Select>
+                </div>
+                <div>
+                  <Title level={5}>Thương hiệu</Title>
+                  <Select
+                    placeholder="Thương hiệu"
+                    style={{ width: "100%" }}
+                    value={filters.brand}
+                    onChange={(value) => setFilters({ ...filters, brand: value })}
+                    className="filter-select"
+                  >
+                    <Option value="">Tất cả</Option>
+                    <Option value="Vans">Vans</Option>
+                    <Option value="Adidas">Adidas</Option>
+                    <Option value="Nike">Nike</Option>
+                    <Option value="Shucare">Shucare</Option>
+                  </Select>
+                </div>
+                <div>
+                  <Title level={5}>Màu sắc</Title>
+                  <ColorPicker
+                    value={filters.color}
+                    onChange={(color) => {
+                      const colorNames = {
+                        black: "Đen",
+                        white: "Trắng",
+                        red: "Đỏ",
+                        blue: "Xanh dương",
+                        green: "Xanh lá",
+                        yellow: "Vàng",
+                        "": "",
+                      };
+                      setFilters({ ...filters, color: colorNames[color] });
+                    }}
+                  />
+                </div>
+                <div>
+                  <Title level={5}>Danh mục</Title>
+                  <Select
+                    placeholder="Danh mục"
+                    style={{ width: "100%" }}
+                    value={filters.category_id ?? ""}
+                    onChange={(value) => setFilters({ ...filters, category_id: value || null })}
+                    className="filter-select"
+                  >
+                    <Option value="">Tất cả</Option>
+                    <Option value={1}>Phụ kiện</Option>
+                    <Option value={2}>Giày</Option>
+                  </Select>
+                </div>
+                <div>
+                  <Title level={5}>Sắp xếp theo</Title>
+                  <Select
+                    placeholder="Sắp xếp theo"
+                    style={{ width: "100%" }}
+                    value={sortBy}
+                    onChange={(value) => setSortBy(value)}
+                    className="filter-select"
+                  >
+                    <Option value="">Mặc định</Option>
+                    <Option value="price ASC">Giá tăng dần</Option>
+                    <Option value="price DESC">Giá giảm dần</Option>
+                  </Select>
+                </div>
                 <Button type="primary" block onClick={handleSearch} className="filter-button">
                   Tìm kiếm
                 </Button>

@@ -97,6 +97,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/users/my-info").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/users/{userId}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PUT, "/users/password/{userId}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
 
 
 

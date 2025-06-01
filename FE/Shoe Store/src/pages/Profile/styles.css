@@ -33,3 +33,6 @@
 .edit-button {
   margin-top: 16px;
 }
+.password-form {
+  max-width: 400px;
+}

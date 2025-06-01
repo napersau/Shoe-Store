@@ -15,4 +15,6 @@ public class UserUpdateRequest {
     private String address;
     private String phoneNumber;
     private Date dateOfBirth;
+    private String oldPassword;
+    private String newPassword;
 }
