@@ -1,0 +1,109 @@
+/* Center the entire container and add padding */
+.order-container {
+  max-width: 1400px; /* Increased from 1200px to make table wider */
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f5f5;
+}
+
+/* Style the title */
+.order-container .ant-typography {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Style the status select dropdown */
+.status-select {
+  width: 200px;
+  margin-bottom: 20px;
+  align-self: center;
+}
+
+/* Style the table container to ensure proper alignment */
+.order-table {
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* Ensure table is scrollable on small screens */
+}
+
+/* Ensure table itself is centered and stable */
+.order-table .ant-table {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Style table header */
+.order-table .ant-table-thead > tr > th {
+  background: #1890ff;
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+}
+
+/* Style table rows */
+.order-table .ant-table-tbody > tr > td {
+  text-align: center;
+  padding: 12px;
+  vertical-align: middle;
+}
+
+/* Style the action button */
+.order-table .ant-btn-primary {
+  border-radius: 4px;
+  padding: 4px 12px;
+}
+
+/* Style the loading container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Style the error container */
+.error-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .order-container {
+    padding: 10px;
+  }
+
+  .status-select {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .order-table {
+    width: 100%;
+  }
+
+  .order-table .ant-table-tbody > tr > td {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .order-table .ant-table-thead > tr > th {
+    font-size: 14px;
+    padding: 8px;
+  }
+}

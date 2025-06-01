@@ -1,23 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getToken } from "../../services/localStorageService";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  TableContainer,
-  Select,
-  MenuItem,
-} from "@mui/material";
-
+import { Table, Spin, Alert, Typography, Select, Button } from "antd";
 import { Link } from "react-router-dom";
-import { Button } from "@mui/material";
+import "./styles.css";
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const OrderClient = () => {
   const [orders, setOrders] = useState([]);
@@ -45,7 +34,9 @@ const OrderClient = () => {
         }
 
         const data = await response.json();
-        setOrders(data.result);
+        // Sort orders by orderDate in descending order (most recent first)
+        const sortedOrders = data.result.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        setOrders(sortedOrders);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -56,86 +47,92 @@ const OrderClient = () => {
     fetchOrders();
   }, [navigate, status]);
 
+  const columns = [
+    { title: "ID", dataIndex: "id", key: "id", width: 80 },
+    { title: "Họ tên", dataIndex: "fullName", key: "fullName", width: 150 },
+    { title: "Email", dataIndex: "email", key: "email", width: 200 },
+    { title: "Địa chỉ", dataIndex: "address", key: "address", width: 200 },
+    { title: "Ghi chú", dataIndex: "note", key: "note", width: 150 },
+    {
+      title: "Ngày đặt hàng",
+      dataIndex: "orderDate",
+      key: "orderDate",
+      width: 150,
+      render: (text) => new Date(text).toLocaleString(),
+    },
+    { title: "Trạng thái", dataIndex: "status", key: "status", width: 150 },
+    {
+      title: "Tổng tiền",
+      dataIndex: "totalMoney",
+      key: "totalMoney",
+      width: 120,
+      render: (text) => `${text.toLocaleString()} VND`,
+    },
+    { 
+      title: "Phương thức thanh toán", 
+      dataIndex: "paymentMethod", 
+      key: "paymentMethod", 
+      width: 180 // Increased width for better visibility
+    },
+    { 
+      title: "Trạng thái thanh toán", 
+      dataIndex: "paymentStatus", 
+      key: "paymentStatus", 
+      width: 180 // Increased width for better visibility
+    },
+    {
+      title: "Hành động",
+      key: "action",
+      width: 120,
+      render: (_, record) => (
+        <Link to={`/order/${record.id}`}>
+          <Button type="primary" size="small">
+            Xem chi tiết
+          </Button>
+        </Link>
+      ),
+    },
+  ];
+
   if (loading) {
     return (
-      <>
-
-        <Box display="flex" justifyContent="center" mt={5}>
-          <CircularProgress />
-        </Box>
-      </>
+      <div className="loading-container">
+        <Spin size="large" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <Box display="flex" justifyContent="center" mt={5}>
-          <Typography color="error">{error}</Typography>
-        </Box>
-      </>
+      <div className="error-container">
+        <Alert message={error} type="error" showIcon />
+      </div>
     );
   }
 
   return (
-    <>
-      <Box p={3}>
-        <Typography variant="h5" gutterBottom>
-          Danh sách đơn hàng
-        </Typography>
-
-        <Select value={status} onChange={(e) => setStatus(e.target.value)} displayEmpty>
-          <MenuItem value="">Tất cả</MenuItem>
-          <MenuItem value="Người bán đang chuẩn bị hàng">Người bán đang chuẩn bị hàng</MenuItem>
-          <MenuItem value="Đang giao hàng">Đang giao hàng</MenuItem>
-          <MenuItem value="Đã nhận hàng">Đã nhận hàng</MenuItem>
-          <MenuItem value="Hủy đơn hàng">Hủy đơn hàng</MenuItem>
-        </Select>
-
-        <TableContainer component={Paper} sx={{ mt: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Họ tên</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Địa chỉ</TableCell>
-                <TableCell>Ghi chú</TableCell>
-                <TableCell>Ngày đặt hàng</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Tổng tiền</TableCell>
-                <TableCell>Phương thức thanh toán</TableCell>
-                <TableCell>Trạng thái thanh toán</TableCell>
-                <TableCell>Hành động</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{order.id}</TableCell>
-                  <TableCell>{order.fullName}</TableCell>
-                  <TableCell>{order.email}</TableCell>
-                  <TableCell>{order.address}</TableCell>
-                  <TableCell>{order.note}</TableCell>
-                  <TableCell>{new Date(order.orderDate).toLocaleString()}</TableCell>
-                  <TableCell>{order.status}</TableCell>
-                  <TableCell>{order.totalMoney.toLocaleString()} VND</TableCell>
-                  <TableCell>{order.paymentMethod}</TableCell>
-                  <TableCell>{order.paymentStatus}</TableCell>
-                  <TableCell>
-                    <Link to={`/order/${order.id}`}>
-                      <Button variant="contained" color="primary" size="small">
-                        Xem chi tiết
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </>
+    <div className="order-container">
+      <Title level={3}>Danh sách đơn hàng</Title>
+      <Select
+        value={status}
+        onChange={(value) => setStatus(value)}
+        placeholder="Chọn trạng thái"
+        className="status-select"
+      >
+        <Option value="">Tất cả</Option>
+        <Option value="Người bán đang chuẩn bị hàng">Người bán đang chuẩn bị hàng</Option>
+        <Option value="Đang giao hàng">Đang giao hàng</Option>
+        <Option value="Đã nhận hàng">Đã nhận hàng</Option>
+        <Option value="Hủy đơn hàng">Hủy đơn hàng</Option>
+      </Select>
+      <Table
+        columns={columns}
+        dataSource={orders}
+        rowKey="id"
+        className="order-table"
+        pagination={{ pageSize: 10 }}
+      />
+    </div>
   );
 };
 

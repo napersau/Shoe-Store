@@ -1,31 +1,19 @@
+// src/components/ProductAdmin.jsx
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Typography,
-  IconButton,
-  Button,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Table, Button, Spin, message, Typography, Space, Popconfirm, Image } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getToken } from "../../services/localStorageService";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import "./styles.css"; // Import the custom CSS file
+
+const { Title } = Typography;
 
 export default function ProductAdmin() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const token = getToken();
@@ -60,7 +48,7 @@ export default function ProductAdmin() {
         console.error("Lỗi API:", error);
         setError(error.message);
         setLoading(false);
-        setSnackBarOpen(true);
+        message.error(error.message);
       });
   };
 
@@ -68,109 +56,126 @@ export default function ProductAdmin() {
     navigate(`/admin/edit-product/${id}`);
   };
 
-  const [successMessage, setSuccessMessage] = useState("");
-
   const handleDelete = (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-      const token = getToken();
-      fetch(`http://localhost:8080/products/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const token = getToken();
+    fetch(`http://localhost:8080/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Không thể xóa sản phẩm!");
+        }
+        setProducts(products.filter((product) => product.id !== id));
+        setSuccessMessage("Xóa sản phẩm thành công!");
+        message.success("Xóa sản phẩm thành công!");
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Không thể xóa sản phẩm!");
-          }
-          setProducts(products.filter((product) => product.id !== id));
-  
-          // Hiển thị thông báo xóa thành công
-          setSuccessMessage("Xóa sản phẩm thành công!");
-          setSnackBarOpen(true);
-        })
-        .catch((error) => {
-          console.error("Lỗi khi xóa sản phẩm:", error);
-          setError(error.message);
-          setSnackBarOpen(true);
-        });
-    }
+      .catch((error) => {
+        console.error("Lỗi khi xóa sản phẩm:", error);
+        setError(error.message);
+        message.error(error.message);
+      });
   };
 
+  const columns = [
+    {
+      title: "Tên sản phẩm",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => `${price.toLocaleString()} VND`,
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image",
+      key: "image",
+      render: (image, record) => (
+        <Image src={image} alt={record.name} width={80} height={80} />
+      ),
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Thương hiệu",
+      dataIndex: "brand",
+      key: "brand",
+    },
+    {
+      title: "Màu sắc",
+      dataIndex: "color",
+      key: "color",
+    },
+    {
+      title: "Danh mục",
+      dataIndex: "category",
+      key: "category",
+      render: (category) => category.name,
+    },
+    {
+      title: "Ch chức năng",
+      key: "actions",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record.id)}
+          >
+            Sửa
+          </Button>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn xóa sản phẩm này?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Có"
+            cancelText="Không"
+          >
+            <Button type="danger" icon={<DeleteOutlined />}>
+              Xóa
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
   return (
-    <>
-
-      <Box display="flex" flexDirection="column" alignItems="center" mt="100px">
-        <Typography variant="h4" gutterBottom>
-          Danh sách sản phẩm
-        </Typography>
-
-        {loading ? (
-          <CircularProgress />
-        ) : error ? (
-          <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={() => setSnackBarOpen(false)}>
-            <Alert severity="error">{error}</Alert>
-          </Snackbar>
-        ) : (
-          <TableContainer component={Paper} sx={{ width: "90%", mt: 3 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><b>Tên sản phẩm</b></TableCell>
-                  <TableCell><b>Giá</b></TableCell>
-                  <TableCell><b>Hình ảnh</b></TableCell>
-                  <TableCell><b>Mô tả</b></TableCell>
-                  <TableCell><b>Thương hiệu</b></TableCell>
-                  <TableCell><b>Màu sắc</b></TableCell>
-                  <TableCell><b>Danh mục</b></TableCell>
-                  <TableCell><b>Chức năng</b></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>{product.name}</TableCell>
-                    <TableCell>{product.price.toLocaleString()} VND</TableCell>
-                    <TableCell>
-                      <img src={product.image} alt={product.name} width="80" height="80" />
-                    </TableCell>
-                    <TableCell>{product.description}</TableCell>
-                    <TableCell>{product.brand}</TableCell>
-                    <TableCell>{product.color}</TableCell>
-                    <TableCell>{product.category.name}</TableCell>
-                    <TableCell>
-                      <IconButton color="primary" onClick={() => handleEdit(product.id)}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => handleDelete(product.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {/* Hàng chứa nút "Thêm sản phẩm" */}
-                <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    <Button variant="contained" color="primary" onClick={() => navigate("/admin/add-product")}>
-                      Thêm sản phẩm
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Box>
-      <Snackbar
-        open={snackBarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackBarOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }} // Hiển thị góc phải trên cùng
-      >
-        <Alert severity={successMessage ? "success" : "error"}>
-          {successMessage || error}
-        </Alert>
-      </Snackbar>
-    </>
+    <div className="product-admin-container">
+      <Title level={2} className="product-admin-title">
+        Danh sách sản phẩm
+      </Title>
+      {loading ? (
+        <div className="loading-container">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <Table
+            columns={columns}
+            dataSource={products}
+            rowKey="id"
+            pagination={false}
+            className="product-table"
+          />
+          <div className="add-product-container">
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => navigate("/admin/add-product")}
+            >
+              Thêm sản phẩm
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }

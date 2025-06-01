@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Footer from "../../components/Footer";
-import HeaderClient from "../../components/header_client/HeaderClient";
+import HeaderClient from "../../components/HeaderClient"
 import { Layout } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
@@ -32,7 +32,7 @@ function LayoutDefault() {
         <Layout style={{ minHeight: "100vh" }}>
             {userRole === "ADMIN" && isAdminPage && (
                 <Sider collapsed={collapsed} theme="light" className="sider" width={250}>
-                    <div className="header__collapse" onClick={() => setCollapsed(!collapsed)}>
+                    <div className="header__collapse" style={{marginTop:30}} onClick={() => setCollapsed(!collapsed)}>
                         {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                     </div>
                     <MenuSider />

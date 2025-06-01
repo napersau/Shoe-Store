@@ -1,33 +1,27 @@
+// src/components/OrderAdmin.jsx
 import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
-  Box,
   Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Typography,
-  IconButton,
   Button,
+  Spin,
+  message,
+  Typography,
   Select,
-  MenuItem,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+  Space,
+} from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import { getToken } from "../../services/localStorageService";
-import EditIcon from "@mui/icons-material/Edit";
-import { Link } from "react-router-dom";
+import "./styles.css"; // Import the custom CSS file
+
+const { Title } = Typography;
+const { Option } = Select;
 
 export default function OrderAdmin() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
   const [updatedOrders, setUpdatedOrders] = useState({});
   const [filterStatus, setFilterStatus] = useState("");
@@ -65,7 +59,7 @@ export default function OrderAdmin() {
         console.error("Lỗi API:", error);
         setError(error.message);
         setLoading(false);
-        setSnackBarOpen(true);
+        message.error(error.message);
       });
   };
 
@@ -97,11 +91,12 @@ export default function OrderAdmin() {
       .then(() => {
         setEditingOrder(null);
         fetchOrders();
+        message.success("Cập nhật đơn hàng thành công!");
       })
       .catch((error) => {
         console.error("Lỗi khi cập nhật đơn hàng:", error);
         setError(error.message);
-        setSnackBarOpen(true);
+        message.error(error.message);
       });
   };
 
@@ -113,104 +108,149 @@ export default function OrderAdmin() {
     ? orders.filter((order) => order.status === filterStatus)
     : orders;
 
-  return (
-    <>
-      <Box display="flex" flexDirection="column" alignItems="center" mt="100px">
-        <Typography variant="h4" gutterBottom>
-          Quản lý đơn hàng
-        </Typography>
-
-        <Select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          displayEmpty
-          sx={{ mb: 2 }}
-        >
-          <MenuItem value="">Tất cả trạng thái</MenuItem>
-          <MenuItem value="Người bán đang chuẩn bị hàng">Người bán đang chuẩn bị hàng</MenuItem>
-          <MenuItem value="Đang giao hàng">Đang giao hàng</MenuItem>
-          <MenuItem value="Đã nhận hàng">Đã nhận hàng</MenuItem>
-          <MenuItem value="Hủy đơn hàng">Hủy đơn hàng</MenuItem>
-        </Select>
-
-        {loading ? (
-          <CircularProgress />
-        ) : error ? (
-          <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={() => setSnackBarOpen(false)}>
-            <Alert severity="error">{error}</Alert>
-          </Snackbar>
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Họ tên",
+      dataIndex: "fullName",
+      key: "fullName",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "address",
+      key: "address",
+    },
+    {
+      title: "Tổng tiền",
+      dataIndex: "totalMoney",
+      key: "totalMoney",
+      render: (totalMoney) => `${totalMoney.toLocaleString()} VND`,
+    },
+    {
+      title: "Ngày đặt",
+      dataIndex: "orderDate",
+      key: "orderDate",
+      render: (orderDate) => new Date(orderDate).toLocaleString(),
+    },
+    {
+      title: "Ghi chú",
+      dataIndex: "note",
+      key: "note",
+    },
+    {
+      title: "Phương thức thanh toán",
+      dataIndex: "paymentMethod",
+      key: "paymentMethod",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status, record) =>
+        editingOrder === record.id ? (
+          <Select
+            value={updatedOrders.status}
+            onChange={(value) => handleChange("status", value)}
+            style={{ width: 200 }}
+          >
+            <Option value="Người bán đang chuẩn bị hàng">Người bán đang chuẩn bị hàng</Option>
+            <Option value="Đang giao hàng">Đang giao hàng</Option>
+            <Option value="Đã nhận hàng">Đã nhận hàng</Option>
+            <Option value="Hủy đơn hàng">Hủy đơn hàng</Option>
+          </Select>
         ) : (
-          <TableContainer component={Paper} sx={{ width: "90%", mt: 3 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><b>ID</b></TableCell>
-                  <TableCell><b>Họ tên</b></TableCell>
-                  <TableCell><b>Email</b></TableCell>
-                  <TableCell><b>Địa chỉ</b></TableCell>
-                  <TableCell><b>Tổng tiền</b></TableCell>
-                  <TableCell><b>Ngày đặt</b></TableCell>
-                  <TableCell><b>Ghi chú</b></TableCell>
-                  <TableCell><b>Phương thức thanh toán</b></TableCell>
-                  <TableCell><b>Trạng thái</b></TableCell>
-                  <TableCell><b>Trạng thái thanh toán</b></TableCell>
-                  <TableCell><b>Hành động</b></TableCell>
-                  <TableCell><b>Xem chi tiết</b></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order.id}</TableCell>
-                    <TableCell>{order.fullName}</TableCell>
-                    <TableCell>{order.email}</TableCell>
-                    <TableCell>{order.address}</TableCell>
-                    <TableCell>{order.totalMoney}</TableCell>
-                    <TableCell>{new Date(order.orderDate).toLocaleString()}</TableCell>
-                    <TableCell>{order.note}</TableCell>
-                    <TableCell>{order.paymentMethod}</TableCell>
-                    <TableCell>
-                      {editingOrder === order.id ? (
-                        <Select value={updatedOrders.status} onChange={(e) => handleChange("status", e.target.value)}>
-                          <MenuItem value="Người bán đang chuẩn bị hàng">Người bán đang chuẩn bị hàng</MenuItem>
-                          <MenuItem value="Đang giao hàng">Đang giao hàng</MenuItem>
-                          <MenuItem value="Đã nhận hàng">Đã nhận hàng</MenuItem>
-                          <MenuItem value="Hủy đơn hàng">Hủy đơn hàng</MenuItem>
-                        </Select>
-                      ) : (
-                        order.status
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingOrder === order.id ? (
-                        <Select value={updatedOrders.paymentStatus} onChange={(e) => handleChange("paymentStatus", e.target.value)}>
-                          <MenuItem value="Chưa thanh toán">Chưa thanh toán</MenuItem>
-                          <MenuItem value="Đã thanh toán">Đã thanh toán</MenuItem>
-                        </Select>
-                      ) : (
-                        order.paymentStatus
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton color="primary" onClick={() => handleEdit(order)}>
-                        <EditIcon />
-                      </IconButton>
-                      {editingOrder === order.id && (
-                        <Button variant="contained" color="primary" onClick={handleUpdate}>
-                          Lưu
-                        </Button>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="contained" component={Link} to={`/order/${order.id}`}>Xem chi tiết</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Box>
-    </>
+          status
+        ),
+    },
+    {
+      title: "Trạng thái thanh toán",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (paymentStatus, record) =>
+        editingOrder === record.id ? (
+          <Select
+            value={updatedOrders.paymentStatus}
+            onChange={(value) => handleChange("paymentStatus", value)}
+            style={{ width: 150 }}
+          >
+            <Option value="Chưa thanh toán">Chưa thanh toán</Option>
+            <Option value="Đã thanh toán">Đã thanh toán</Option>
+          </Select>
+        ) : (
+          paymentStatus
+        ),
+    },
+    {
+      title: "Hành động",
+      key: "actions",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            type="primary"
+          >
+            Sửa
+          </Button>
+          {editingOrder === record.id && (
+            <Button type="primary" onClick={handleUpdate}>
+              Lưu
+            </Button>
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: "Xem chi tiết",
+      key: "details",
+      render: (_, record) => (
+        <Button type="link">
+          <Link to={`/order/${record.id}`}>Xem chi tiết</Link>
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <div className="order-admin-container">
+      <Title level={2} className="order-admin-title">
+        Quản lý đơn hàng
+      </Title>
+      <Select
+        value={filterStatus}
+        onChange={(value) => setFilterStatus(value)}
+        placeholder="Tất cả trạng thái"
+        style={{ width: 200, marginBottom: 16 }}
+        allowClear
+      >
+        <Option value="">Tất cả trạng thái</Option>
+        <Option value="Người bán đang chuẩn bị hàng">Người bán đang chuẩn bị hàng</Option>
+        <Option value="Đang giao hàng">Đang giao hàng</Option>
+        <Option value="Đã nhận hàng">Đã nhận hàng</Option>
+        <Option value="Hủy đơn hàng">Hủy đơn hàng</Option>
+      </Select>
+      {loading ? (
+        <div className="loading-container">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={filteredOrders}
+          rowKey="id"
+          pagination={false}
+          className="order-table"
+        />
+      )}
+    </div>
   );
 }

@@ -93,4 +93,20 @@ public class CartDetailServiceImpl implements CartDetailService{
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public CartDetailResponse updateCartDetail(Long id, CartDetailRequest cartDetailRequest) {
+        var context = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(context).orElseThrow(()
+                -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        CartDetail cartDetail = cartDetailRepository.findById(id).get();
+        cartDetail.setNumberOfProducts(cartDetailRequest.getNumberOfProducts());
+
+        cartDetail.setTotalMoney(cartDetail.getProduct().getPrice() * cartDetailRequest.getNumberOfProducts());
+        cartDetailRepository.save(cartDetail);
+
+        cartService.updateToltalMoneyCart(user.getCart());
+        return modelMapper.map(cartDetail, CartDetailResponse.class);
+    }
+
 }

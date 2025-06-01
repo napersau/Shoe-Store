@@ -18,7 +18,7 @@ import ProductAdmin from "../pages/ProductAdmin";
 import AddProduct from "../pages/ProductAdmin/addProduct";
 import EditProduct from "../pages/ProductAdmin/editProduct";
 import User from "../pages/Users";
-import HomeAd from "../pages/Home/homeAdmin";
+import HomeAd from "../pages/Home";
 import PrivateRoutesAdmin from "../components/PrivateRoutes/adminPrivate";
 import Payments from "../pages/PaymentsCart/payments";
 import PaymentSuscess from "../pages/PaymentsCart/PaymentSuscess";

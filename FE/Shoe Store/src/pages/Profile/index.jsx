@@ -1,25 +1,18 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Paper,
-  Button,
-  TextField,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Card, Typography, Spin, message, Button, Form, Input } from "antd";
 import { getToken } from "../../services/localStorageService";
+import "./styles.css";
+
+const { Title, Text } = Typography;
 
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({});
+  const [form] = Form.useForm();
 
   useEffect(() => {
     const token = getToken();
@@ -54,13 +47,18 @@ export default function Profile() {
           phoneNumber: data.result.phoneNumber || "",
           dateOfBirth: data.result.dateOfBirth || "",
         });
+        form.setFieldsValue({
+          fullName: data.result.fullName || "",
+          address: data.result.address || "",
+          phoneNumber: data.result.phoneNumber || "",
+          dateOfBirth: data.result.dateOfBirth || "",
+        });
         setLoading(false);
       })
       .catch((error) => {
         console.error("Lỗi API:", error);
-        setError(error.message);
+        message.error(error.message);
         setLoading(false);
-        setSnackBarOpen(true);
       });
   };
 
@@ -70,7 +68,7 @@ export default function Profile() {
 
   const handleCancel = () => {
     setEditing(false);
-    setUpdatedUser({
+    form.setFieldsValue({
       fullName: user.fullName || "",
       address: user.address || "",
       phoneNumber: user.phoneNumber || "",
@@ -97,75 +95,87 @@ export default function Profile() {
       .then((data) => {
         setUser(data.result);
         setEditing(false);
-        setSnackBarOpen(true);
+        message.success("Cập nhật thành công!");
         setTimeout(() => {
-            window.location.reload(); // Load lại trang sau khi cập nhật thành công
-          }, 5000);
+          window.location.reload();
+        }, 2000);
       })
       .catch((error) => {
         console.error("Lỗi API:", error);
-        setError(error.message);
-        setSnackBarOpen(true);
+        message.error(error.message);
       });
   };
 
-  const handleChange = (e) => {
-    setUpdatedUser({ ...updatedUser, [e.target.name]: e.target.value });
+  const handleChange = (changedValues) => {
+    setUpdatedUser({ ...updatedUser, ...changedValues });
   };
 
   return (
-    <>
-      <Box display="flex" flexDirection="column" alignItems="center" mt="100px">
-        <Typography variant="h4" gutterBottom>
-          Thông tin cá nhân
-        </Typography>
+    <div className="profile-container">
+      <Title level={2} className="profile-title">
+        Thông tin cá nhân
+      </Title>
 
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <Paper elevation={3} sx={{ padding: 3, width: "50%" }}>
-            {editing ? (
-              <>
-                <TextField fullWidth margin="normal" label="Họ và tên" name="fullName" value={updatedUser.fullName} onChange={handleChange} />
-                <TextField fullWidth margin="normal" label="Địa chỉ" name="address" value={updatedUser.address} onChange={handleChange} />
-                <TextField fullWidth margin="normal" label="Số điện thoại" name="phoneNumber" value={updatedUser.phoneNumber} onChange={handleChange} />
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Ngày sinh"
-                  name="dateOfBirth"
-                  type="date"
-                  value={updatedUser.dateOfBirth ? updatedUser.dateOfBirth.substring(0, 10) : ""}
-                  onChange={handleChange}
-                  InputLabelProps={{
-                    shrink: true, // Giữ nhãn luôn hiển thị
-                  }}
-                />
-                <Box mt={2} display="flex" justifyContent="space-between">
-                  <Button variant="contained" color="secondary" onClick={handleCancel}>Hủy</Button>
-                  <Button variant="contained" color="primary" onClick={handleUpdate}>Cập nhật</Button>
-                </Box>
-              </>
-            ) : (
-              <>
-                <Typography variant="h6">Tên đăng nhập: {user?.username || "Chưa cập nhật"}</Typography>
-                <Typography variant="h6">Họ và tên: {user?.fullName || "Chưa cập nhật"}</Typography>
-                <Typography variant="h6">Địa chỉ: {user?.address || "Chưa cập nhật"}</Typography>
-                <Typography variant="h6">Ngày sinh: {user?.dateOfBirth || "Chưa cập nhật"}</Typography>
-                <Typography variant="h6">Số điện thoại: {user?.phoneNumber || "Chưa cập nhật"}</Typography>
-
-
-                <Box mt={2}>
-                  <Button variant="contained" color="primary" onClick={handleEdit}>Chỉnh sửa thông tin</Button>
-                </Box>
-              </>
-            )}
-          </Paper>
-        )}
-      </Box>
-      <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={() => setSnackBarOpen(false)}>
-        <Alert severity={error ? "error" : "success"}>{error || "Cập nhật thành công!"}</Alert>
-      </Snackbar>
-    </>
+      {loading ? (
+        <Spin size="large" />
+      ) : (
+        <Card className="profile-card">
+          {editing ? (
+            <Form
+              form={form}
+              layout="vertical"
+              onValuesChange={handleChange}
+              className="profile-form"
+            >
+              <Form.Item label="Họ và tên" name="fullName">
+                <Input />
+              </Form.Item>
+              <Form.Item label="Địa chỉ" name="address">
+                <Input />
+              </Form.Item>
+              <Form.Item label="Số điện thoại" name="phoneNumber">
+                <Input />
+              </Form.Item>
+              <Form.Item label="Ngày sinh" name="dateOfBirth">
+                <Input type="date" />
+              </Form.Item>
+              <div className="form-actions">
+                <Button onClick={handleCancel} style={{ marginRight: 8 }}>
+                  Hủy
+                </Button>
+                <Button type="primary" onClick={handleUpdate}>
+                  Cập nhật
+                </Button>
+              </div>
+            </Form>
+          ) : (
+            <>
+              <Text strong>Tên đăng nhập: </Text>
+              <Text>{user?.username || "Chưa cập nhật"}</Text>
+              <br />
+              <Text strong>Họ và tên: </Text>
+              <Text>{user?.fullName || "Chưa cập nhật"}</Text>
+              <br />
+              <Text strong>Địa chỉ: </Text>
+              <Text>{user?.address || "Chưa cập nhật"}</Text>
+              <br />
+              <Text strong>Ngày sinh: </Text>
+              <Text>{user?.dateOfBirth || "Chưa cập nhật"}</Text>
+              <br />
+              <Text strong>Số điện thoại: </Text>
+              <Text>{user?.phoneNumber || "Chưa cập nhật"}</Text>
+              <br />
+              <Button
+                type="primary"
+                onClick={handleEdit}
+                className="edit-button"
+              >
+                Chỉnh sửa thông tin
+              </Button>
+            </>
+          )}
+        </Card>
+      )}
+    </div>
   );
 }

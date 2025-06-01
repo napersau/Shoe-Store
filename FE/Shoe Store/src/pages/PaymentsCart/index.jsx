@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getToken } from "../../services/localStorageService";
+import { Row, Col, Form, Input, Button, Radio, Spin, List, Typography, Alert, Image } from "antd";
+import axios from "axios";
+import "./styles.css";
+
+const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 const PaymentsCart = () => {
   const navigate = useNavigate();
@@ -9,15 +15,7 @@ const PaymentsCart = () => {
   const [cartDetails, setCartDetails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    address: "",
-    note: "",
-    paymentMethod: "Thanh toán khi nhận hàng",
-    // Đã xoá paymentStatus
-  });
+  const [form] = Form.useForm();
 
   useEffect(() => {
     const token = getToken();
@@ -48,33 +46,23 @@ const PaymentsCart = () => {
     fetchCartDetails();
   }, [navigate]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handlePaymentMethodChange = (e) => {
-    setFormData({ ...formData, paymentMethod: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values) => {
     const token = getToken();
-  
+
     if (!cartDetails || cartDetails.length === 0) {
       alert("Giỏ hàng của bạn đang trống!");
       return;
     }
-  
+
     const orderData = {
-      ...formData,
+      ...values,
       numberOfProducts: cartDetails.length,
       totalMoney,
       cartDetails,
       paymentStatus: "Đang chờ thanh toán",
     };
-  
+
     try {
-      // Gửi đơn hàng trước
       const orderResponse = await fetch("http://localhost:8080/order", {
         method: "POST",
         headers: {
@@ -83,57 +71,86 @@ const PaymentsCart = () => {
         },
         body: JSON.stringify(orderData),
       });
-  
+
       if (!orderResponse.ok) {
         const errorData = await orderResponse.json();
         throw new Error(errorData.message || "Không thể tạo đơn hàng");
       }
-  
+
       const orderResult = await orderResponse.json();
-      localStorage.setItem("orderId", orderResult.result.id); // Lưu orderId nếu cần
-  
-      if (formData.paymentMethod === "VNPay - Cổng thanh toán điện tử") {
-        // Tạo yêu cầu thanh toán VNPay sau khi đã có đơn hàng
+      localStorage.setItem("orderId", orderResult.result.id);
+
+      // Gửi email xác nhận
+      const emailContent = cartDetails.map((item, index) => (
+        `\n${index + 1}. Sản phẩm: ${item.product.name}` +
+        `\n   - Số lượng: ${item.numberOfProducts}` +
+        `\n   - Size: ${item.size}` +
+        `\n   - Giá: ${item.product.price.toLocaleString()} VNĐ`
+      )).join("\n");
+
+      const emailBody = `Cảm ơn bạn đã đặt hàng!\n\nThông tin đơn hàng:\n${emailContent}\n\nTổng tiền: ${totalMoney.toLocaleString()} VNĐ\n\nChúng tôi sẽ xử lý đơn hàng và liên hệ sớm nhất.`;
+
+      try {
+        await axios.post(
+          "http://localhost:8080/order/email",
+          {
+            to: values.email,
+            subject: "Xác nhận đơn hàng",
+            text: emailBody,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Gửi mail thành công");
+      } catch (emailError) {
+        console.error("Lỗi khi gửi mail:", emailError);
+      }
+
+      // Nếu chọn VNPay
+      if (values.paymentMethod === "VNPay - Cổng thanh toán điện tử") {
         const paymentResponse = await fetch(
           `http://localhost:8080/payment/vn-pay?amount=${totalMoney}&bankCode=NCB`
         );
-  
+
         if (!paymentResponse.ok) {
           throw new Error("Không thể tạo thanh toán VNPay");
         }
-  
+
         const paymentData = await paymentResponse.json();
         if (paymentData.code === 200 && paymentData.result.paymentUrl) {
-        // ✅ Xoá giỏ hàng trước khi chuyển hướng
-        const deleteResponse = await fetch("http://localhost:8080/cart", {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+          // Xoá giỏ hàng
+          const deleteResponse = await fetch("http://localhost:8080/cart", {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-        if (!deleteResponse.ok) {
-          throw new Error("Không thể xóa giỏ hàng sau khi tạo thanh toán VNPay");
-        }
+          if (!deleteResponse.ok) {
+            throw new Error("Không thể xóa giỏ hàng sau khi tạo thanh toán VNPay");
+          }
 
-          // ✅ Sau khi xóa giỏ hàng, chuyển hướng tới VNPay
           window.location.href = paymentData.result.paymentUrl;
         } else {
           alert("Lỗi khi tạo thanh toán VNPay!");
         }
       } else {
-        // Xoá giỏ hàng sau khi đặt hàng (COD)
+        // Thanh toán khi nhận hàng
         const deleteResponse = await fetch("http://localhost:8080/cart", {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         if (!deleteResponse.ok) {
           throw new Error("Không thể xóa giỏ hàng sau khi đặt hàng");
         }
-  
+
         alert("Đặt hàng thành công! Giỏ hàng đã được xóa.");
         navigate("/order");
       }
@@ -142,98 +159,98 @@ const PaymentsCart = () => {
       alert(`Lỗi khi đặt hàng: ${error.message}`);
     }
   };
-  
 
   return (
-    <div className="container mt-5">
-      <h2>Thanh toán giỏ hàng</h2>
-      <div className="row">
-        <div className="col-md-6">
-          <h4>Giỏ hàng của bạn</h4>
+    <div className="payment-container">
+      <Title level={2} className="payment-title">
+        Thanh toán giỏ hàng
+      </Title>
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={12}>
+          <Title level={4}>Giỏ hàng của bạn</Title>
           {loading ? (
-            <p>Đang tải giỏ hàng...</p>
+            <Spin tip="Đang tải giỏ hàng..." />
           ) : error ? (
-            <p className="text-danger">{error}</p>
+            <Alert message={error} type="error" showIcon />
           ) : cartDetails.length === 0 ? (
-            <p>Giỏ hàng trống</p>
+            <Text>Giỏ hàng trống</Text>
           ) : (
-            <ul className="list-group">
-              {cartDetails.map((item, index) => (
-                <li key={index} className="list-group-item">
-                  <img src={item.product.image} alt={item.product.name} />
-                  <div className="product-info">
-                    <h6>{item.product.name}</h6>
-                    <div className="product-details">
-                      <span>Size: {item.size}</span>
-                      <span>Số lượng: {item.numberOfProducts}</span>
+            <List
+              dataSource={cartDetails}
+              renderItem={(item, index) => (
+                <List.Item className="cart-item">
+                  <Image
+                    src={item.product.image}
+                    alt={item.product.name}
+                    width={80}
+                    height={80}
+                    className="cart-item-image"
+                  />
+                  <div className="cart-item-info">
+                    <Text strong>{item.product.name}</Text>
+                    <div className="cart-item-details">
+                      <Text>Size: {item.size}</Text>
+                      <Text>Số lượng: {item.numberOfProducts}</Text>
                     </div>
-                    <p>Giá: {item.product.price.toLocaleString()} VNĐ</p>
+                    <Text>Giá: {item.product.price.toLocaleString()} VNĐ</Text>
                   </div>
-                </li>
-              ))}
-            </ul>
+                </List.Item>
+              )}
+            />
           )}
-        </div>
+        </Col>
 
-        {/* Form thanh toán */}
-        <div className="col-md-6">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label>Họ và tên</label>
-              <input type="text" className="form-control" name="fullName" value={formData.fullName} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label>Email</label>
-              <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label>Địa chỉ</label>
-              <input type="text" className="form-control" name="address" value={formData.address} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label>Ghi chú</label>
-              <textarea className="form-control" name="note" value={formData.note} onChange={handleChange}></textarea>
-            </div>
-            <div className="mb-3">
-              <label>Tổng tiền</label>
-              <input type="number" className="form-control" value={totalMoney} readOnly />
-            </div>
-            <div className="mb-3">
-              <label>Phương thức thanh toán</label>
-              <div className="form-check">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  id="cod"
-                  name="paymentMethod"
-                  value="Thanh toán khi nhận hàng"
-                  checked={formData.paymentMethod === "Thanh toán khi nhận hàng"}
-                  onChange={handlePaymentMethodChange}
-                />
-                <label className="form-check-label" htmlFor="cod">
-                  Thanh toán khi nhận hàng
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  id="vnpay"
-                  name="paymentMethod"
-                  value="VNPay - Cổng thanh toán điện tử"  //  Thay đổi giá trị ở đây
-                  checked={formData.paymentMethod === "VNPay - Cổng thanh toán điện tử"}
-                  onChange={handlePaymentMethodChange}
-                />
-                <label className="form-check-label" htmlFor="vnpay">
-                  Thanh toán qua VNPay
-                </label>
-              </div>
-            </div>
-
-            <button type="submit" className="btn btn-success">Xác nhận thanh toán</button>
-          </form>
-        </div>
-      </div>
+        <Col xs={24} md={12}>
+          <Form
+            form={form}
+            onFinish={handleSubmit}
+            initialValues={{
+              paymentMethod: "Thanh toán khi nhận hàng",
+            }}
+            layout="vertical"
+            className="payment-form"
+          >
+            <Form.Item
+              label="Họ và tên"
+              name="fullName"
+              rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
+            >
+              <Input placeholder="Nhập họ và tên" />
+            </Form.Item>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[{ required: true, type: "email", message: "Vui lòng nhập email hợp lệ" }]}
+            >
+              <Input placeholder="Nhập email" />
+            </Form.Item>
+            <Form.Item
+              label="Địa chỉ"
+              name="address"
+              rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
+            >
+              <Input placeholder="Nhập địa chỉ" />
+            </Form.Item>
+            <Form.Item label="Ghi chú" name="note">
+              <TextArea rows={4} placeholder="Nhập ghi chú (nếu có)" />
+            </Form.Item>
+            <Form.Item label="Tổng tiền">
+              <Input value={totalMoney?.toLocaleString()} disabled />
+            </Form.Item>
+            <Form.Item label="Phương thức thanh toán" name="paymentMethod">
+              <Radio.Group>
+                <Radio value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</Radio>
+                <Radio value="VNPay - Cổng thanh toán điện tử">Thanh toán qua VNPay</Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block>
+                Xác nhận thanh toán
+              </Button>
+            </Form.Item>
+          </Form>
+        </Col>
+      </Row>
     </div>
   );
 };

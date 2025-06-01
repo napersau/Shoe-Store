@@ -1,0 +1,192 @@
+/* Tùy chỉnh giao diện header */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+  padding: 15px 20px; /* Kích thước ban đầu */
+}
+
+/* Trạng thái khi cuộn */
+.header-container.scrolled {
+  padding: 8px 20px; /* Thu nhỏ padding */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Bóng đậm hơn khi cuộn */
+}
+
+/* Container chính để căn giữa nội dung */
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Logo */
+.logo {
+  font-size: 28px;
+  font-weight: bold;
+  transition: font-size 0.3s ease;
+}
+
+.header-container.scrolled .logo {
+  font-size: 24px; /* Thu nhỏ logo khi cuộn */
+}
+
+.logo a {
+  color: #52c41a;
+  text-decoration: none;
+}
+
+.logo a:hover {
+  color: #389e0d;
+}
+
+/* Menu chính */
+.main-menu {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.main-menu .ant-menu {
+  display: flex;
+  align-items: center; /* Căn giữa các mục menu theo chiều dọc */
+  justify-content: center;
+  line-height: normal; /* Xóa line-height mặc định của Ant Design */
+  margin-top: 0 !important; /* Ghi đè margin-top không mong muốn */
+}
+
+.main-menu .ant-menu-item {
+  display: flex;
+  align-items: center; /* Căn giữa biểu tượng và văn bản */
+  font-size: 16px;
+  padding: 0 20px;
+  transition: font-size 0.3s ease;
+}
+
+.main-menu .ant-menu-item .anticon {
+  font-size: 18px; /* Kích thước biểu tượng đồng nhất */
+  margin-right: 8px; /* Khoảng cách giữa biểu tượng và văn bản */
+  vertical-align: middle; /* Căn chỉnh chính xác */
+  line-height: 1; /* Ngăn vấn đề về line-height */
+}
+
+.header-container.scrolled .main-menu .ant-menu-item {
+  font-size: 14px; /* Thu nhỏ font menu khi cuộn */
+}
+
+.main-menu .ant-menu-item a {
+  color: #000;
+  display: flex;
+  align-items: center; /* Đảm bảo nội dung link được căn giữa */
+}
+
+.main-menu .ant-menu-item a:hover {
+  color: #52c41a;
+}
+
+/* Các nút hành động */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+
+.nav-actions .ant-btn.nav-button {
+  display: flex;
+  align-items: center; /* Căn giữa biểu tượng theo chiều dọc */
+  justify-content: center; /* Căn giữa biểu tượng theo chiều ngang */
+  font-size: 20px;
+  color: #000;
+  padding: 0 15px;
+  height: 32px; /* Chiều cao cố định để đồng nhất */
+  line-height: 32px; /* Căn giữa theo chiều dọc */
+  transition: all 0.3s ease;
+}
+
+.nav-actions .ant-btn.nav-button .anticon {
+  font-size: 20px; /* Kích thước biểu tượng đồng nhất */
+  vertical-align: middle; /* Căn chỉnh chính xác */
+  line-height: 1; /* Ngăn vấn đề về line-height */
+}
+
+.header-container.scrolled .nav-actions .ant-btn.nav-button {
+  font-size: 18px; /* Thu nhỏ biểu tượng khi cuộn */
+  height: 28px; /* Điều chỉnh chiều cao khi cuộn */
+  line-height: 28px;
+}
+
+.nav-actions .ant-btn.nav-button:hover {
+  color: #52c41a;
+  transform: scale(1.1);
+}
+
+/* Alert tùy chỉnh */
+.custom-alert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1100;
+  max-width: 300px;
+}
+
+/* Thêm padding cho body để tránh nội dung bị che */
+body {
+  padding-top: 70px; /* Phù hợp với chiều cao header ban đầu */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .main-menu {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  .main-menu .ant-menu {
+    justify-content: flex-start;
+    margin-top: 0 !important; /* Ghi đè margin-top trên mobile */
+  }
+
+  .main-menu .ant-menu-item .anticon {
+    font-size: 16px; /* Biểu tượng nhỏ hơn trên mobile */
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .nav-actions .ant-btn.nav-button {
+    padding: 0 10px;
+    font-size: 18px; /* Biểu tượng nhỏ hơn trên mobile */
+    height: 28px;
+    line-height: 28px;
+  }
+
+  .nav-actions .ant-btn.nav-button .anticon {
+    font-size: 18px; /* Kích thước biểu tượng đồng nhất trên mobile */
+  }
+
+  .header-container {
+    padding: 10px 20px;
+  }
+
+  .header-container.scrolled {
+    padding: 6px 20px;
+  }
+
+  body {
+    padding-top: 130px; /* Tăng padding cho mobile */
+  }
+}

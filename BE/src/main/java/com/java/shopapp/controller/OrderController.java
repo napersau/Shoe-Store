@@ -2,13 +2,18 @@ package com.java.shopapp.controller;
 
 
 import com.java.shopapp.dto.ApiResponse;
+import com.java.shopapp.dto.request.MailRequest;
 import com.java.shopapp.dto.request.OrderRequest;
 import com.java.shopapp.dto.request.OrderUpdateRequest;
+import com.java.shopapp.dto.response.MailResponse;
 import com.java.shopapp.dto.response.OrderResponse;
+import com.java.shopapp.service.EmailService;
 import com.java.shopapp.service.OrderService;
+import jakarta.mail.MessagingException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +24,21 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-
+    private final EmailService emailService;
 
     // Đặt hàng bằng giỏ hàng
     @PostMapping
     ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest) {
         ApiResponse<OrderResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(orderService.createOrder(orderRequest));
+        return apiResponse;
+    }
+
+    @PostMapping("/email")
+    ApiResponse<String> sendEmail(@RequestBody MailRequest mailRequest) throws MessagingException {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        emailService.sendSimpleMessage(mailRequest);
+        apiResponse.setResult("Gửi mail thành công");
         return apiResponse;
     }
 
@@ -89,7 +102,6 @@ public class OrderController {
         ApiResponse<OrderResponse> apiResponse = new ApiResponse<>();
         orderService.updateOrderPaymentStatusById(orderId, "Đã thanh toán");
         return apiResponse;
-
     }
 
 }

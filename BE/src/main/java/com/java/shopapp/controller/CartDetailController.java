@@ -25,6 +25,13 @@ public class CartDetailController {
         return apiResponse;
     }
 
+    @PutMapping("/{id}")
+    ApiResponse<CartDetailResponse> updateCartDetail(@PathVariable Long id, @RequestBody @Valid CartDetailRequest cartDetailRequest) {
+        ApiResponse<CartDetailResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(cartDetailService.updateCartDetail(id, cartDetailRequest));
+        return apiResponse;
+    }
+
     @DeleteMapping("/{id}")
     ApiResponse<CartDetailResponse> deleteCartDetail(@PathVariable Long id) {
         ApiResponse<CartDetailResponse> apiResponse = new ApiResponse<>();

@@ -116,6 +116,13 @@
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
 
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+			<version>3.1.5</version>
+		</dependency>
+
 <!--		Swapper-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
