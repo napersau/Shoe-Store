@@ -21,4 +21,5 @@ public class UserResponse {
     private int googleAccountId;
     private String phoneNumber;
     private Long cartId;
+    private String email;
 }

@@ -45,6 +45,10 @@ public class User {
     @Column(name = "phonenumber")
     private String phoneNumber;
 
+
+    @Column(name = "email")
+    private String email;
+
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "cart_id")
     private Cart cart;

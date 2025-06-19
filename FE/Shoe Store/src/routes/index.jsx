@@ -22,6 +22,7 @@ import HomeAd from "../pages/Home";
 import PrivateRoutesAdmin from "../components/PrivateRoutes/adminPrivate";
 import Payments from "../pages/PaymentsCart/payments";
 import PaymentSuscess from "../pages/PaymentsCart/PaymentSuscess";
+import ForgotPassword from "../pages/ForgotPassword";
 
 export const routes = [
     {
@@ -40,6 +41,10 @@ export const routes = [
             {
                 path: 'login',
                 element: <Login />
+            },
+            {
+                path: 'forgot-password',
+                element: <ForgotPassword />
             },
             {
                 path: 'register',

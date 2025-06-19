@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getToken } from "../../services/localStorageService";
 import './style.css'
+
 const sizes = [
   { value: "34.5", soldout: false },
   { value: "35", soldout: false },
@@ -24,7 +25,6 @@ const sizes = [
 
 const ProductDetails = () => {
   const { productId } = useParams();
-  console.log(productId)
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -53,16 +53,21 @@ const ProductDetails = () => {
       return;
     }
 
-    if (product.category !== "accessory" && !selectedSize) {
+    // Kiểm tra category ID = 2 phải chọn size
+    if (product.category.id === 2 && (!selectedSize || selectedSize === "0")) {
       alert("Vui lòng chọn size trước khi mua!");
       return;
     }
 
     const totalMoney = product.price * quantity;
+    
+    // Nếu category ID = 1 (phụ kiện) thì có thể gửi null hoặc empty string
+    const finalSize = product.category.id === 1 ? null : selectedSize;
+    
     navigate("/payments", {
       state: {
         quantity,
-        size: selectedSize,
+        size: finalSize,
         totalMoney,
         productId: Number(productId),
       },
@@ -70,18 +75,27 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = async () => {
-    if (product.category !== "accessory" && !selectedSize) {
+    console.log(product)
+    
+    // Kiểm tra category ID = 2 phải chọn size
+    if (product.category.id === 2 && (!selectedSize || selectedSize === "0")) {
       alert("Vui lòng chọn size trước khi thêm vào giỏ hàng!");
       return;
     }
 
     const totalMoney = product.price * quantity;
+    
+    // Nếu category ID = 1 (phụ kiện) thì có thể gửi null hoặc empty string
+    const finalSize = product.category.id === 1 ? null : selectedSize;
+    
     const cartData = {
       productId: product.id,
       numberOfProducts: quantity,
       totalMoney: totalMoney,
-      size: selectedSize,
+      size: finalSize,
     };
+
+    console.log("Cart data being sent:", cartData); // Debug log
 
     const token = getToken();
 
@@ -95,7 +109,11 @@ const ProductDetails = () => {
         body: JSON.stringify(cartData),
       });
 
-      if (!response.ok) throw new Error("Không thể thêm vào giỏ hàng");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Response error:", errorText);
+        throw new Error(`Không thể thêm vào giỏ hàng: ${response.status}`);
+      }
       alert("Thêm vào giỏ hàng thành công!");
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
@@ -126,7 +144,8 @@ const ProductDetails = () => {
                   <p>{product.description}</p>
                   <h6>Màu sắc: <strong>{product.color}</strong></h6>
 
-                  {product.category.id !== 1 && (
+                  {/* Chỉ hiển thị chọn size khi category.id === 2 */}
+                  {product.category.id === 2 && (
                     <>
                       <h6>Chọn size:</h6>
                       <div className="swatch-grid">

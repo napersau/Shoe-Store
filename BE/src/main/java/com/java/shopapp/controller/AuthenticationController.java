@@ -72,7 +72,6 @@ public class AuthenticationController {
         authenticationRequest.setPassword(email);
         authenticationRequest.setLoginMethod("LoginGoogle");
         var result = authenticationService.authenticate(authenticationRequest);
-        String redirectUrl = "http://localhost:3000/oauth2/redirect?token=" + result.getToken();
 
         return ApiResponse.<AuthenticationResponse>builder()
                 .code(1000)

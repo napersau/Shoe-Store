@@ -18,4 +18,5 @@ public class UserCreateRequest {
     private String password;
     private String fullName;
     private String phoneNumber;
+    private String email;
 }

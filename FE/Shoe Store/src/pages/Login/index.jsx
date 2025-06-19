@@ -21,7 +21,8 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
-      window.location.href = "http://localhost:8080/oauth2/authorization/google";
+      window.location.href =
+        "http://localhost:8080/oauth2/authorization/google";
     } catch (error) {
       console.error("Lỗi đăng nhập Google:", error);
       showError(error.message);
@@ -84,6 +85,15 @@ export default function Login() {
             </Form.Item>
             <Form.Item>
               <Button
+                type="link"
+                onClick={() => navigate("/forgot-password")}
+                className="forgot-password-link"
+              >
+                Quên mật khẩu?
+              </Button>
+            </Form.Item>
+            <Form.Item>
+              <Button
                 type="primary"
                 htmlType="submit"
                 size="large"
@@ -108,7 +118,9 @@ export default function Login() {
             size="large"
             block
             type="default"
-            onClick={() => (window.location.href = "http://localhost:3000/register")}
+            onClick={() =>
+              (window.location.href = "http://localhost:3000/register")
+            }
             className="register-button"
           >
             Tạo tài khoản

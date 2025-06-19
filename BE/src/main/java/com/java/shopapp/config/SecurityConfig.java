@@ -79,7 +79,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/order").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.POST, "/order/{id}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/order").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, "/order/email").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.GET, "/order", "/order/filter").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.GET, "/order/manager", "/order/manager/filter").hasRole(Role.ADMIN.name())
                         //Order-Details
@@ -98,6 +97,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users/my-info").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/users/{userId}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.PUT, "/users/password/{userId}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+
+                        //Email
+                        .requestMatchers( "/email", "email/**").permitAll()
 
 
 

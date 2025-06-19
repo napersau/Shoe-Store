@@ -1,260 +1,185 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Typography, Spin, message, Button, Form, Input } from "antd";
+import axios from "axios";
 import { getToken } from "../../services/localStorageService";
 import "./styles.css";
 
 const { Title, Text } = Typography;
+
+// Axios config
+axios.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+const API_BASE = "http://localhost:8080";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [updatedUser, setUpdatedUser] = useState({});
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    if (!getToken()) return navigate("/login");
     fetchUserInfo();
   }, [navigate]);
 
-  const fetchUserInfo = () => {
-    setLoading(true);
-    const token = getToken();
-    fetch("http://localhost:8080/users/my-info", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Không thể tải thông tin người dùng!");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUser(data.result);
-        setUpdatedUser({
-          fullName: data.result.fullName || "",
-          address: data.result.address || "",
-          phoneNumber: data.result.phoneNumber || "",
-          dateOfBirth: data.result.dateOfBirth || "",
-        });
-        form.setFieldsValue({
-          fullName: data.result.fullName || "",
-          address: data.result.address || "",
-          phoneNumber: data.result.phoneNumber || "",
-          dateOfBirth: data.result.dateOfBirth || "",
-        });
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Lỗi API:", error);
-        message.error(error.message);
-        setLoading(false);
-      });
-  };
-
-  const handleEdit = () => {
-    setEditing(true);
-  };
-
-  const handleCancel = () => {
-    setEditing(false);
-    form.setFieldsValue({
-      fullName: user.fullName || "",
-      address: user.address || "",
-      phoneNumber: user.phoneNumber || "",
-      dateOfBirth: user.dateOfBirth || "",
-    });
-  };
-
-  const handleUpdate = () => {
-    const token = getToken();
-    fetch(`http://localhost:8080/users/${user.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(updatedUser),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Cập nhật thông tin thất bại!");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUser(data.result);
-        setEditing(false);
-        message.success("Cập nhật thành công!");
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      })
-      .catch((error) => {
-        console.error("Lỗi API:", error);
-        message.error(error.message);
-      });
-  };
-
-  const handleChange = (changedValues) => {
-    setUpdatedUser({ ...updatedUser, ...changedValues });
-  };
-
-  const handlePasswordChange = (values) => {
-    if (values.newPassword !== values.confirmNewPassword) {
-      message.error("Mật khẩu mới không khớp!");
-      return;
+  const fetchUserInfo = async () => {
+    try {
+      const { data } = await axios.get(`${API_BASE}/users/my-info`);
+      setUser(data.result);
+      form.setFieldsValue(data.result);
+    } catch (error) {
+      message.error("Không thể tải thông tin người dùng!");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const token = getToken();
-    fetch(`http://localhost:8080/users/password/${user.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({
+  const handleUpdate = async (values) => {
+    try {
+      const { data } = await axios.put(`${API_BASE}/users/${user.id}`, values);
+      setUser(data.result);
+      setEditing(false);
+      message.success("Cập nhật thành công!");
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (error) {
+      message.error("Cập nhật thất bại!");
+    }
+  };
+
+  const handlePasswordChange = async (values) => {
+    try {
+      await axios.put(`${API_BASE}/users/password/${user.id}`, {
         oldPassword: values.oldPassword,
         newPassword: values.newPassword,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Đổi mật khẩu thất bại!");
-        }
-        return response.json();
-      })
-      .then(() => {
-        message.success("Đổi mật khẩu thành công!");
-        passwordForm.resetFields();
-        setShowPasswordForm(false);
-      })
-      .catch((error) => {
-        console.error("Lỗi API:", error);
-        message.error(error.message);
       });
+      message.success("Đổi mật khẩu thành công!");
+      passwordForm.resetFields();
+      setShowPasswordForm(false);
+    } catch (error) {
+      message.error("Đổi mật khẩu thất bại!");
+    }
   };
 
-  return (
-    <div className="profile-container">
-      <Title level={2} className="profile-title">
-        Thông tin cá nhân
-      </Title>
+  const userFields = [
+    { label: "Tên đăng nhập", key: "username" },
+    { label: "Họ và tên", key: "fullName" },
+    { label: "Email", key: "email" },
+    { label: "Địa chỉ", key: "address" },
+    { label: "Ngày sinh", key: "dateOfBirth" },
+    { label: "Số điện thoại", key: "phoneNumber" },
+  ];
 
-      {loading ? (
-        <Spin size="large" />
-      ) : (
-        <Card className="profile-card">
-          {editing ? (
-            <Form
-              form={form}
-              layout="vertical"
-              onValuesChange={handleChange}
-              className="profile-form"
-            >
-              <Form.Item label="Họ và tên" name="fullName">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Địa chỉ" name="address">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Số điện thoại" name="phoneNumber">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Ngày sinh" name="dateOfBirth">
-                <Input type="date" />
-              </Form.Item>
-              <div className="form-actions">
-                <Button onClick={handleCancel} style={{ marginRight: 8 }}>
-                  Hủy
-                </Button>
-                <Button type="primary" onClick={handleUpdate}>
-                  Cập nhật
-                </Button>
-              </div>
-            </Form>
-          ) : (
-            <>
-              <Text strong>Tên đăng nhập: </Text>
-              <Text>{user?.username || "Chưa cập nhật"}</Text>
-              <br />
-              <Text strong>Họ và tên: </Text>
-              <Text>{user?.fullName || "Chưa cập nhật"}</Text>
-              <br />
-              <Text strong>Địa chỉ: </Text>
-              <Text>{user?.address || "Chưa cập nhật"}</Text>
-              <br />
-              <Text strong>Ngày sinh: </Text>
-              <Text>{user?.dateOfBirth || "Chưa cập nhật"}</Text>
-              <br />
-              <Text strong>Số điện thoại: </Text>
-              <Text>{user?.phoneNumber || "Chưa cập nhật"}</Text>
-              <br />
-              <Button
-                type="primary"
-                onClick={handleEdit}
-                className="edit-button"
+  const formFields = [
+    { name: "fullName", label: "Họ và tên", required: true },
+    { name: "email", label: "Email", required: true, type: "email" },
+    { name: "address", label: "Địa chỉ" },
+    { name: "phoneNumber", label: "Số điện thoại", pattern: /^[0-9]{10,11}$/ },
+    { name: "dateOfBirth", label: "Ngày sinh", type: "date" },
+  ];
+
+  if (loading) return <div className="profile-loading"><Spin size="large" /></div>;
+
+  return (
+    <div className="profile-container" style={{marginTop:80}}>
+      <Title level={2} className="profile-title">Thông tin cá nhân</Title>
+      
+      <Card className="profile-card">
+        {editing ? (
+          <Form form={form} layout="vertical" onFinish={handleUpdate} className="profile-form">
+            {formFields.map(field => (
+              <Form.Item
+                key={field.name}
+                name={field.name}
+                label={field.label}
+                rules={[
+                  field.required && { required: true, message: `Vui lòng nhập ${field.label.toLowerCase()}` },
+                  field.type === "email" && { type: "email", message: "Email không hợp lệ" },
+                  field.pattern && { pattern: field.pattern, message: "Số điện thoại phải có 10-11 chữ số" }
+                ].filter(Boolean)}
               >
+                <Input type={field.type || "text"} />
+              </Form.Item>
+            ))}
+            <div className="form-actions">
+              <Button onClick={() => setEditing(false)}>Hủy</Button>
+              <Button type="primary" htmlType="submit">Cập nhật</Button>
+            </div>
+          </Form>
+        ) : (
+          <div className="profile-info">
+            {userFields.map(field => (
+              <div key={field.key} className="info-row">
+                <Text strong>{field.label}: </Text>
+                <Text>{user?.[field.key] || "Chưa cập nhật"}</Text>
+              </div>
+            ))}
+            
+            <div className="profile-actions">
+              <Button type="primary" onClick={() => setEditing(true)}>
                 Chỉnh sửa thông tin
               </Button>
-              <Button
-                type="default"
-                onClick={() => setShowPasswordForm(!showPasswordForm)}
-                style={{ marginTop: 12, marginLeft: 12 }}
-              >
+              <Button onClick={() => setShowPasswordForm(!showPasswordForm)}>
                 {showPasswordForm ? "Hủy đổi mật khẩu" : "Đổi mật khẩu"}
               </Button>
+            </div>
 
-              {showPasswordForm && (
-                <Form
-                  form={passwordForm}
-                  layout="vertical"
-                  onFinish={handlePasswordChange}
-                  className="password-form"
-                  style={{ marginTop: 24 }}
+            {showPasswordForm && (
+              <Form
+                form={passwordForm}
+                layout="vertical"
+                onFinish={handlePasswordChange}
+                className="password-form"
+              >
+                <Form.Item
+                  name="oldPassword"
+                  label="Mật khẩu cũ"
+                  rules={[{ required: true, message: "Vui lòng nhập mật khẩu cũ" }]}
                 >
-                  <Form.Item
-                    label="Mật khẩu cũ"
-                    name="oldPassword"
-                    rules={[{ required: true, message: "Vui lòng nhập mật khẩu cũ" }]}
-                  >
-                    <Input.Password />
-                  </Form.Item>
-                  <Form.Item
-                    label="Mật khẩu mới"
-                    name="newPassword"
-                    rules={[{ required: true, message: "Vui lòng nhập mật khẩu mới" }]}
-                  >
-                    <Input.Password />
-                  </Form.Item>
-                  <Form.Item
-                    label="Nhập lại mật khẩu mới"
-                    name="confirmNewPassword"
-                    rules={[{ required: true, message: "Vui lòng nhập lại mật khẩu mới" }]}
-                  >
-                    <Input.Password />
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Xác nhận đổi mật khẩu
-                  </Button>
-                </Form>
-              )}
-            </>
-          )}
-        </Card>
-      )}
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item
+                  name="newPassword"
+                  label="Mật khẩu mới"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mật khẩu mới" },
+                    { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" }
+                  ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item
+                  name="confirmNewPassword"
+                  label="Nhập lại mật khẩu mới"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập lại mật khẩu mới" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue('newPassword') === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('Mật khẩu không khớp!'));
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password />
+                </Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Xác nhận đổi mật khẩu
+                </Button>
+              </Form>
+            )}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

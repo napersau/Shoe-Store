@@ -92,7 +92,7 @@ const PaymentsCart = () => {
 
       try {
         await axios.post(
-          "http://localhost:8080/order/email",
+          "http://localhost:8080/email/order",
           {
             to: values.email,
             subject: "Xác nhận đơn hàng",

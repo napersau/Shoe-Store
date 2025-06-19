@@ -6,5 +6,4 @@ import org.springframework.mail.SimpleMailMessage;
 
 public interface EmailService {
     void sendSimpleMessage(MailRequest request) throws MessagingException;
-    void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment) throws MessagingException;
 }
