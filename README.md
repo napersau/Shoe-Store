@@ -42,7 +42,7 @@ npm start</code></pre>
 cd Shoe-Store</code></pre>  
         <h4>Bước 2: Chạy với Docker Compose:</h4>
         <h4>Build và chạy</h4>
-        <pre><code>docker-compose up --build -d<pre><code>  
+        <pre><code>docker-compose up --build -d</pre></code>  
         <h4>Bước 3: Kiểm tra trạng thái:</h4>
         <pre><code># Xem containers đang chạy
 docker-compose ps
