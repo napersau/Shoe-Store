@@ -100,6 +100,7 @@ public class SecurityConfig {
 
                         //Email
                         .requestMatchers( "/email", "email/**").permitAll()
+                        .requestMatchers( "/api/chatbot", "/api/chatbot/**").permitAll()
 
 
 
